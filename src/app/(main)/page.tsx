@@ -6,6 +6,7 @@ import {
   BlogSection,
   Support,
 } from "@/components/home";
+import DeliveryBanner from "@/components/home/DeliveryBanner";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import PromoBanner from "@/components/home/PromoBanner";
 import ThreeBanners from "@/components/home/ThreeBanners";
@@ -16,7 +17,8 @@ export default function Home() {
     <>
       <Hero />
       <HomeCategory />
-      <FeaturesSection />
+      {/* <FeaturesSection /> */}
+      <DeliveryBanner />
       <PopularProducts />
       <ThreeBanners />
       {/* <TwoBanners /> */}

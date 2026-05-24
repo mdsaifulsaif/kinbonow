@@ -4,49 +4,61 @@ import React from 'react';
 import Link from 'next/link';
 
 const ThreeBanners = () => {
-    // শুধুমাত্র টাইটেল এবং ব্যাকগ্রাউন্ড ইমেজ (যা আপনি public ফোল্ডারে রাখছেন)
+    // ডাটা স্ট্রাকচার আগের মতোই আছে, জাস্ট বাটনের টেক্সট ডায়নামিক করার সুবিধা রাখা হয়েছে
     const banners = [
         {
             id: 1,
             title: "grab your favorite flavor",
-            link: "/shop?filter=mac-cheese",
-            bgImage: "/images/banner-mac.png" // প্রোডাক্টসহ পুরো ব্যাকগ্রাউন্ড ইমেজ
+            link: "/shop?filter=spices",
+            bgImage: "/home/1.png"
         },
         {
             id: 2,
             title: "make a refreshing choice",
-            link: "/shop?filter=perrier",
-            bgImage: "/images/banner-drinks.png" // প্রোডাক্টসহ পুরো ব্যাকগ্রাউন্ড ইমেজ
+            link: "/shop?filter=semai",
+            bgImage: "/home/2.png"
         },
         {
             id: 3,
             title: "bring out the good chips",
-            link: "/shop?filter=chips",
-            bgImage: "/images/banner-chips.png" // প্রোডাক্টসহ পুরো ব্যাকগ্রাউন্ড ইমেজ
+            link: "/shop?filter=nuts",
+            bgImage: "/home/3.png"
         }
     ];
 
     return (
-        <div className="py-12">
+        <div className="">
             {/* গ্লোবাল container ক্লাস */}
             <div className="container">
                 {/* ৩ কলামের রেসপনসিভ গ্রিড */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {banners.map((banner) => (
-                        <Link 
-                            href={banner.link} 
+                        <div 
                             key={banner.id}
-                            className="group block relative rounded-[20px] overflow-hidden min-h-[220px] md:min-h-[240px] bg-cover bg-center transition-transform duration-300 hover:scale-[1.01]"
+                            className="relative rounded-[20px] overflow-hidden min-h-[220px] md:min-h-[250px] bg-cover bg-center transition-all duration-300"
                             style={{ backgroundImage: `url(${banner.bgImage})` }}
                         >
-                            {/* টেক্সট কন্টেইনার (বাম পাশে পজিশন করার জন্য) */}
-                            <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-8 pr-1/2 max-w-[60%]">
+                            {/* টেক্সট কন্টেইনার (বাম পাশে পজিশন করার জন্য এবং কন্টেন্ট গুলোর মাঝে গ্যাপ রাখার জন্য) */}
+                            <div className="absolute inset-0 flex flex-col justify-center items-start pl-6 md:pl-8 max-w-[55%] z-10">
+                                
                                 {/* মেইন টাইটেল - গ্লোবাল Poppins ফন্ট */}
-                                <h3 className="text-white text-[24px] md:text-[28px] font-bold leading-[1.1] tracking-tight capitalize group-hover:opacity-90 transition-opacity">
+                                <h3 className="text-white text-[22px] md:text-[26px] font-bold leading-[1.1] tracking-tight capitalize mb-4">
                                     {banner.title}
                                 </h3>
+
+                                {/* আপনার গ্লোবাল .btn ক্লাস এবং হোভার ইফেক্ট দিয়ে তৈরি Shop Now বাটন */}
+                                <Link 
+                                    href={banner.link} 
+                                    className="btn bg-white text-black font-semibold rounded-full px-5 !py-.3 text-[13px] transition-all hover:bg-gray-100"
+                                >
+                                    Shop Now
+                                </Link>
+
                             </div>
-                        </Link>
+
+                            {/* পুরো কার্ডটাই ক্লিকেবল করার জন্য একটি ওভারলে লিঙ্ক (ঐচ্ছিক, বাটনকে ডিস্টার্ব করবে না) */}
+                            <Link href={banner.link} className="absolute inset-0 z-0" aria-label={banner.title} />
+                        </div>
                     ))}
                 </div>
             </div>
