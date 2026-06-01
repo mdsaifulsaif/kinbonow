@@ -28,8 +28,8 @@ export default function Home() {
       <ThreeBanners />
       <TrendingProducts />
       {/* <TwoBanners /> */}
-      <NewProducts />
-      <BlogSection />
+      {/* <NewProducts /> */}
+      {/* <BlogSection /> */}
       <Support />
     </>
   );

@@ -16,7 +16,7 @@ const dailyProducts = [
     rating: 4.9,
     reviews: 150,
     image:
-      "https://images.unsplash.com/photo-1592924357228-9564da13a56a?q=80&w=800",
+      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=800", // তাজা লাল টমেটো
   },
   {
     id: 102,
@@ -27,7 +27,7 @@ const dailyProducts = [
     rating: 4.8,
     reviews: 98,
     image:
-      "https://images.unsplash.com/photo-1610399555926-8113f412431d?q=80&w=800",
+      "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?q=80&w=800", // একদম ফ্রেশ লাল আপেল
   },
   {
     id: 103,
@@ -38,7 +38,7 @@ const dailyProducts = [
     rating: 4.7,
     reviews: 320,
     image:
-      "https://images.unsplash.com/photo-1586201375761-83865001e88c?q=80&w=800",
+      "https://images.unsplash.com/photo-1536304997881-a372c179924b?q=80&w=800", // চাল/ভাত এর রিয়েল লাইভ শট
   },
   {
     id: 104,
@@ -49,7 +49,7 @@ const dailyProducts = [
     rating: 4.6,
     reviews: 210,
     image:
-      "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800",
+      "https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?q=80&w=800", // তাজা কাঁচা মাছ
   },
   {
     id: 105,
@@ -60,8 +60,19 @@ const dailyProducts = [
     rating: 4.9,
     reviews: 450,
     image:
-      "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?q=80&w=800",
+      "https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=800", // ঝুড়িতে রাখা ফার্মের ফ্রেশ ডিম
   },
+  // {
+  //   id: 106,
+  //   name: "Premium Liquid Milk (1L)",
+  //   categoryName: "Dairy",
+  //   price: 90,
+  //   mrp: 100,
+  //   rating: 4.9,
+  //   reviews: 280,
+  //   image:
+  //     "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=800", // গ্লাসে ঢালা ফ্রেশ তরল দুধ
+  // },
 ];
 
 const DailyEssentials: React.FC = () => {
