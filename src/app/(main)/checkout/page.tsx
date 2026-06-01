@@ -36,16 +36,16 @@ const CheckoutPage = () => {
         paymentMethod: 'cod',
         shippingMethod: 'standard'
     });
-
-    useEffect(() => {
-        if (items.length === 0) {
-            router.push('/cart');
-        }
-        if (!isAuthenticated) {
-            toast.error('Please login to proceed with checkout');
-            router.push('/login?redirect=/checkout');
-        }
-    }, [items, isAuthenticated, router]);
+ // eta ami apadoto comment kore raklam
+    // useEffect(() => {
+    //     if (items.length === 0) {
+    //         router.push('/cart');
+    //     }
+    //     if (!isAuthenticated) {
+    //         toast.error('Please login to proceed with checkout');
+    //         router.push('/login?redirect=/checkout');
+    //     }
+    // }, [items, isAuthenticated, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -85,7 +85,7 @@ const CheckoutPage = () => {
     const shippingCost = formData.shippingMethod === 'express' ? 150 : (totalPrice >= 5000 ? 0 : 60);
     const grandTotal = totalPrice + shippingCost;
 
-    if (items.length === 0 || !isAuthenticated) return null;
+    // if (items.length === 0 || !isAuthenticated) return null;
 
     return (
         <div className="bg-gray-50/50 min-h-screen pb-20">
