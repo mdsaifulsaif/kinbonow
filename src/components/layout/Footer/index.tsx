@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
                             <span className="text-2xl font-semibold text-white">KinboNow</span>
                         </div>
                         <p className="text-sm leading-relaxed mb-6 italic">
-                            "Providing the best products for our customers since 2020. Quality and satisfaction guaranteed."
+                            "Providing the best products for our customers since 2026. Quality and satisfaction guaranteed."
                         </p>
                         <div className="flex gap-4">
                             {[FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram].map((Icon, i) => (
@@ -118,11 +118,11 @@ const Footer: React.FC = () => {
                             </li>
                             <li className="flex gap-4">
                                 <AiOutlinePhone className="text-[var(--color-primary)] flex-shrink-0" size={24} />
-                                <span className="text-sm">+8801783176838</span>
+                                <span className="text-sm">+8801723177766</span>
                             </li>
                             <li className="flex gap-4">
                                 <AiOutlineMail className="text-[var(--color-primary)] flex-shrink-0" size={24} />
-                                <span className="text-sm">support@ShopBangla.com</span>
+                                <span className="text-sm">support@sobjihut.com</span>
                             </li>
                         </ul>
                         <div className="mt-8">
@@ -144,7 +144,7 @@ const Footer: React.FC = () => {
             <div className="bg-[#111111] py-8">
                 <div className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-16 flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-sm text-gray-500">
-                        Copyright © {new Date().getFullYear()} <span className="text-white font-bold">ShopBangla</span>. All Rights Reserved.
+                        Copyright © {new Date().getFullYear()} <span className="text-white font-bold">Sobjihut</span>. All Rights Reserved.
                     </p>
                     <div className="flex items-center gap-4 grayscale opacity-50">
                         <FaCcVisa size={30} />

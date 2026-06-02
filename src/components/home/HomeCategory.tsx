@@ -23,7 +23,7 @@ const categories = [
 
 const HomeCategory = () => {
   return (
-    <div className="py-16">
+    <div className="pb-10 pt-4">
       <div className="container">
         {/* Swiper Slider কনফিগারেশন */}
         <Swiper
