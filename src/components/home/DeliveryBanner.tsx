@@ -31,7 +31,7 @@ const DeliveryBanner = () => {
             {/* টেক্সট ব্লক */}
             <div className="flex flex-col justify-center pt-2">
               <h2 className="text-[24px] sm:text-[28px] md:text-[32px] font-extrabold text-[#232630] leading-[1.2] tracking-tight capitalize">
-              groceries delivered <br className="hidden lg:block" /> in 30 minutes!
+              groceries delivered <br className="hidden lg:block" /> in 60 minutes max!
               </h2>
               <p className="text-[#6B7280] mt-2 text-[14px] font-medium">
                 Fresh and fast, right at your door step anytime.

@@ -273,3 +273,20 @@ h6 {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+
+
+/* Globals.css text flow */
+
+/* 1. Active Dot Color Override */
+.swiper .swiper-pagination-bullet-active {
+    background-color: var(--color-primary) !important;
+    background: var(--color-primary) !important;
+    opacity: 1 !important;
+}
+
+/* 2. Inactive Dots (Baki dot gulor) Color */
+.swiper .swiper-pagination-bullet {
+    background-color: #4B5966 !important; /* Apnar secondary muted color */
+    opacity: 0.4 !important;
+}
