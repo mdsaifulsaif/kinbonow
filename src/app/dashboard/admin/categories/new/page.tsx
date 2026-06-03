@@ -92,6 +92,8 @@ const CategoryFormInner = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        console.log(formData )
+
         try {
             if (isEditing) {
                 await updateCategory({ id: categoryId, data: formData }).unwrap();

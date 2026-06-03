@@ -110,7 +110,7 @@ const Hero: React.FC<HeroProps> = ({
                   ১. মোবাইলে 'h-auto' এবং 'aspect-[16/9]' বা ইমেজের রেশিও অনুযায়ী কন্টেইনার নিজে থেকে ছোট-বড় হবে। কোনো এক্সট্রা কালার বা ব্যাকগ্রাউন্ড আসবে না।
                   ২. ডেক্সটপে (lg) আপনার দেওয়া ফিক্সড 'h-[570px]' এ কাজ করবে এবং ইমেজটি পুরো উইডথ জুড়ে সুন্দর লাগবে।
                 */}
-                <div className='w-full h-auto aspect-[16/9] sm:aspect-[16/7] md:h-[520px] lg:h-[570px] rounded-2xl overflow-hidden relative group shadow-sm'>
+                <div className='w-full h-auto aspect-[16/9] sm:aspect-[16/7] md:h-[400px] lg:h-[400px] xl:h-[570px] rounded-2xl overflow-hidden relative group shadow-sm'>
                     
                     {/* Banners Renderer Map */}
                     {banners.map((image, index) => (

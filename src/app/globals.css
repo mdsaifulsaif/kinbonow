@@ -8,6 +8,7 @@
 /* ===== CSS Variables System for Theme Customization ===== */
 :root {
   /* Colors - Can be customized from admin */
+  /* --color-primary: #199e75; */
   --color-primary: #619d23;
   --color-secondary: #4B5966;
   --color-accent: #FF6B6B;
