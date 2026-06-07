@@ -2,12 +2,29 @@ import { baseApi } from "./baseApi";
 
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // getProducts: builder.query({
+    //   query: (params) => ({
+    //     url: "/products",
+    //     params,
+    //   }),
+    //   providesTags: ["Products"],
+    // }),
     getProducts: builder.query({
       query: (params) => ({
         url: "/products",
-        params,
+        params, // এখানে আপনার ফিল্টার, সার্চ, পেজিনেশন সব প্যারামস যাবে
       }),
-      providesTags: ["Products"],
+      // আপডেট: লিস্টের আইডিগুলো ট্র্যাক করার জন্য ট্যাগ
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }: any) => ({
+                type: "Products" as const,
+                id: _id,
+              })),
+              "Products",
+            ]
+          : ["Products"],
     }),
     getProductById: builder.query({
       query: (id) => `/products/${id}`,
