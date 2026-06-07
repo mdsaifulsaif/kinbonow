@@ -64,6 +64,16 @@ const menuItems = [
         ]
     },
     {
+        name: 'Brands',
+        href: '/dashboard/admin/brands',
+        icon: FiGrid,
+        badge: null,
+        submenu: [
+            { name: 'All Brands', href: '/dashboard/admin/brands' },
+            { name: 'Create Brand', href: '/dashboard/admin/brands/new' },
+        ]
+    },
+    {
         name: 'Orders',
         href: '/dashboard/admin/orders',
         icon: FiShoppingCart,
