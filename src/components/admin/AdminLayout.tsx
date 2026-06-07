@@ -74,6 +74,16 @@ const menuItems = [
         ]
     },
     {
+        name: 'Units',
+        href: '/dashboard/admin/units',
+        icon: FiGrid,
+        badge: null,
+        submenu: [
+            { name: 'All Unit', href: '/dashboard/admin/units' },
+            { name: 'Create Unit', href: '/dashboard/admin/units/new' },
+        ]
+    },
+    {
         name: 'Orders',
         href: '/dashboard/admin/orders',
         icon: FiShoppingCart,
