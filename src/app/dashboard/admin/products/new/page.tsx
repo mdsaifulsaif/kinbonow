@@ -1,5 +1,3 @@
-
-
 // "use client";
 
 // import React, { useState, useEffect, Suspense } from "react";
@@ -784,11 +782,6 @@
 
 // export default ProductForm;
 
-
-
-
-
-
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
@@ -803,7 +796,6 @@ import { useGetCategoriesQuery } from "@/redux/api/categoryApi";
 import { useGetUnitsQuery } from "@/redux/api/unitApi";
 import { useGetBrandsQuery } from "@/redux/api/brandApi";
 import { toast } from "react-hot-toast";
-
 
 import ProductFormHeader from "../_components/ProductFormHeader";
 import ProductTypeToggle from "../_components/ProductTypeToggle";
@@ -822,22 +814,44 @@ const ProductFormInner = () => {
 
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
-  const { data: productToEdit } = useGetProductByIdQuery(productId, { skip: !isEditing });
+  const { data: productToEdit } = useGetProductByIdQuery(productId, {
+    skip: !isEditing,
+  });
   const { data: categoriesData } = useGetCategoriesQuery({});
   const { data: unitsData } = useGetUnitsQuery({});
   const { data: allProductsData } = useGetProductsQuery({ limit: 100 });
   const { data: brandsData } = useGetBrandsQuery({});
 
   const [formData, setFormData] = useState<any>({
-    name: "", slug: "", description: "", shortDescription: "",
-    productType: "single", costPrice: "", regularPrice: "", salePrice: "",
-    stock: "", sku: "", lowStockAlert: 5, weightOrVolume: "",
-    categoryID: "", unit: "", brandID: "nonebrand", status: "active",
-    isFeatured: false, isNew: true, isOnSale: false,
-    lowdown: [], specifications: [], variants: [], comboItems: [],
-    freeShipping: false, shippingCost: "", weight: "",
+    name: "",
+    slug: "",
+    description: "",
+    shortDescription: "",
+    productType: "single",
+    costPrice: "",
+    regularPrice: "",
+    salePrice: "",
+    stock: "",
+    sku: "",
+    lowStockAlert: 5,
+    weightOrVolume: "",
+    categoryID: "",
+    unit: "",
+    brandID: "nonebrand",
+    status: "active",
+    isFeatured: false,
+    isNew: true,
+    isOnSale: false,
+    lowdown: [],
+    specifications: [],
+    variants: [],
+    comboItems: [],
+    freeShipping: false,
+    shippingCost: "",
+    weight: "",
     dimensions: { length: "", width: "", height: "" },
-    metaTitle: "", metaDescription: "",
+    metaTitle: "",
+    metaDescription: "",
   });
 
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -849,7 +863,8 @@ const ProductFormInner = () => {
     if (isEditing && productToEdit?.data) {
       const prod = productToEdit.data;
       setFormData({
-        ...formData, ...prod,
+        ...formData,
+        ...prod,
         categoryID: prod.categoryID?._id || prod.categoryID,
         unit: prod.unit?._id || prod.unit,
         brandID: prod.brandID?._id || prod.brandID || "nonebrand",
@@ -864,7 +879,11 @@ const ProductFormInner = () => {
     }
   }, [isEditing, productToEdit]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
@@ -874,20 +893,37 @@ const ProductFormInner = () => {
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: type === "checkbox" ? checked : type === "number" ? (value === "" ? "" : Number(value)) : value,
+          [child]:
+            type === "checkbox"
+              ? checked
+              : type === "number"
+                ? value === ""
+                  ? ""
+                  : Number(value)
+                : value,
         },
       }));
     } else {
       setFormData((prev: any) => ({
         ...prev,
-        [name]: type === "checkbox" ? checked : type === "number" ? (value === "" ? "" : Number(value)) : value,
+        [name]:
+          type === "checkbox"
+            ? checked
+            : type === "number"
+              ? value === ""
+                ? ""
+                : Number(value)
+              : value,
       }));
     }
 
     if (name === "name" && !isEditing) {
       setFormData((prev: any) => ({
         ...prev,
-        slug: value.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, ""),
+        slug: value
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, ""),
       }));
     }
   };
@@ -896,7 +932,18 @@ const ProductFormInner = () => {
   const addVariant = () => {
     setFormData((prev: any) => ({
       ...prev,
-      variants: [...prev.variants, { unitID: "", weightOrVolume: "", regularPrice: "", salePrice: "", stock: "", sku: "" }],
+      variants: [
+        ...prev.variants,
+        {
+          unitID: "",
+          weightOrVolume: "",
+          costPrice: "",
+          regularPrice: "",
+          salePrice: "",
+          stock: "",
+          sku: "",
+        },
+      ],
     }));
   };
 
@@ -904,18 +951,38 @@ const ProductFormInner = () => {
     const updatedVariants = [...formData.variants];
     updatedVariants[index] = {
       ...updatedVariants[index],
-      [field]: value === "" ? "" : ["weightOrVolume", "regularPrice", "salePrice", "stock"].includes(field) ? Number(value) : value,
+      [field]:
+        value === ""
+          ? ""
+          : [
+                "weightOrVolume",
+                "costPrice",
+                "regularPrice",
+                "salePrice",
+                "stock",
+              ].includes(field)
+            ? Number(value)
+            : value,
     };
     setFormData((prev: any) => ({ ...prev, variants: updatedVariants }));
   };
 
   const removeVariant = (index: number) => {
-    setFormData((prev: any) => ({ ...prev, variants: formData.variants.filter((_: any, i: number) => i !== index) }));
+    setFormData((prev: any) => ({
+      ...prev,
+      variants: formData.variants.filter((_: any, i: number) => i !== index),
+    }));
   };
 
   // ===== COMBO =====
   const addComboItem = () => {
-    setFormData((prev: any) => ({ ...prev, comboItems: [...prev.comboItems, { productID: "", selectedVariant: "", quantity: 1 }] }));
+    setFormData((prev: any) => ({
+      ...prev,
+      comboItems: [
+        ...prev.comboItems,
+        { productID: "", selectedVariant: "", quantity: 1 },
+      ],
+    }));
   };
 
   const handleComboItemChange = (index: number, field: string, value: any) => {
@@ -926,26 +993,51 @@ const ProductFormInner = () => {
         if (field === "productID") {
           const target = availableProducts.find((p: any) => p._id === value);
           if (target && (!target.variants || target.variants.length === 0)) {
-            if ((target.stock || 0) <= 0) { toast.error(`"${target.name}" স্টক আউট!`); return { ...item, productID: "", selectedVariant: "", quantity: "" }; }
+            if ((target.stock || 0) <= 0) {
+              toast.error(`"${target.name}" স্টক আউট!`);
+              return {
+                ...item,
+                productID: "",
+                selectedVariant: "",
+                quantity: "",
+              };
+            }
           }
-          return { ...item, productID: value, selectedVariant: "", quantity: 1 };
+          return {
+            ...item,
+            productID: value,
+            selectedVariant: "",
+            quantity: 1,
+          };
         }
         if (field === "selectedVariant") {
-          const target = availableProducts.find((p: any) => p._id === item.productID);
+          const target = availableProducts.find(
+            (p: any) => p._id === item.productID,
+          );
           const variant = target?.variants?.find((v: any) => v._id === value);
-          if (variant && (variant.stock || 0) <= 0) { toast.error(`এই variant স্টক আউট।`); return { ...item, selectedVariant: "" }; }
+          if (variant && (variant.stock || 0) <= 0) {
+            toast.error(`এই variant স্টক আউট।`);
+            return { ...item, selectedVariant: "" };
+          }
           return { ...item, selectedVariant: value, quantity: 1 };
         }
         if (field === "quantity") {
           if (value === "") return { ...item, quantity: "" };
-          const target = availableProducts.find((p: any) => p._id === item.productID);
+          const target = availableProducts.find(
+            (p: any) => p._id === item.productID,
+          );
           let maxStock = target?.stock || 0;
           if (target?.variants?.length > 0) {
-            const v = target.variants.find((v: any) => v._id === item.selectedVariant);
+            const v = target.variants.find(
+              (v: any) => v._id === item.selectedVariant,
+            );
             maxStock = v ? v.stock : 0;
           }
           const inputQty = Math.max(1, Number(value));
-          if (inputQty > maxStock) { toast.error(`সর্বোচ্চ স্টক ${maxStock} টি!`); return { ...item, quantity: maxStock }; }
+          if (inputQty > maxStock) {
+            toast.error(`সর্বোচ্চ স্টক ${maxStock} টি!`);
+            return { ...item, quantity: maxStock };
+          }
           return { ...item, quantity: inputQty };
         }
         return item;
@@ -955,12 +1047,20 @@ const ProductFormInner = () => {
   };
 
   const removeComboItem = (index: number) => {
-    setFormData((prev: any) => ({ ...prev, comboItems: formData.comboItems.filter((_: any, i: number) => i !== index) }));
+    setFormData((prev: any) => ({
+      ...prev,
+      comboItems: formData.comboItems.filter(
+        (_: any, i: number) => i !== index,
+      ),
+    }));
   };
 
   // ===== SPEC =====
   const addSpecification = () => {
-    setFormData((prev: any) => ({ ...prev, specifications: [...prev.specifications, { key: "", value: "" }] }));
+    setFormData((prev: any) => ({
+      ...prev,
+      specifications: [...prev.specifications, { key: "", value: "" }],
+    }));
   };
 
   const handleSpecChange = (index: number, field: string, value: string) => {
@@ -970,20 +1070,31 @@ const ProductFormInner = () => {
   };
 
   const removeSpecification = (index: number) => {
-    setFormData((prev: any) => ({ ...prev, specifications: formData.specifications.filter((_: any, i: number) => i !== index) }));
+    setFormData((prev: any) => ({
+      ...prev,
+      specifications: formData.specifications.filter(
+        (_: any, i: number) => i !== index,
+      ),
+    }));
   };
 
   // ===== MEDIA =====
   const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { setThumbnailFile(file); setThumbnailPreview(URL.createObjectURL(file)); }
+    if (file) {
+      setThumbnailFile(file);
+      setThumbnailPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleGallerySelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       setGalleryFiles((prev) => [...prev, ...files]);
-      setGalleryPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
+      setGalleryPreviews((prev) => [
+        ...prev,
+        ...files.map((f) => URL.createObjectURL(f)),
+      ]);
     }
   };
 
@@ -995,20 +1106,41 @@ const ProductFormInner = () => {
   // ===== SUBMIT =====
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!formData.categoryID) return toast.error("Please select a category");
-    if (!formData.unit) return toast.error("Please select a unit");
 
     const hasVariants = formData.variants.length > 0;
+    const isCombo = formData.productType === "combo";
+
+    if (!formData.categoryID) return toast.error("Please select a category");
+
+    // ✅ unit শুধু single (no variant) এ required
+    if (!isCombo && !hasVariants && !formData.unit) {
+      return toast.error("Please select a unit");
+    }
+
+    // ✅ combo এ কমপক্ষে একটা item
+    if (
+      isCombo &&
+      formData.comboItems.filter((item: any) => item.productID !== "")
+        .length === 0
+    ) {
+      return toast.error("Please add at least one product for Combo Bundle");
+    }
 
     const cleanedData = {
       ...formData,
+      // ✅ unit — combo/variant এ undefined
+      unit: isCombo || hasVariants ? undefined : formData.unit,
+      // ✅ brandID — combo তে undefined
+      brandID: isCombo ? undefined : formData.brandID,
       costPrice: formData.costPrice === "" ? 0 : formData.costPrice,
       regularPrice: formData.regularPrice === "" ? 0 : formData.regularPrice,
       salePrice: formData.salePrice === "" ? 0 : formData.salePrice,
       stock: formData.stock === "" ? 0 : formData.stock,
-      weightOrVolume: formData.weightOrVolume === "" ? undefined : formData.weightOrVolume,
+      weightOrVolume:
+        formData.weightOrVolume === "" ? undefined : formData.weightOrVolume,
       variants: formData.variants.map((v: any) => ({
         ...v,
+        costPrice: v.costPrice === "" ? 0 : Number(v.costPrice),
         weightOrVolume: v.weightOrVolume === "" ? 0 : v.weightOrVolume,
         regularPrice: v.regularPrice === "" ? 0 : v.regularPrice,
         salePrice: v.salePrice === "" ? 0 : v.salePrice,
@@ -1016,19 +1148,34 @@ const ProductFormInner = () => {
       })),
       comboItems: formData.comboItems
         .filter((item: any) => item.productID !== "")
-        .map((item: any) => ({ ...item, quantity: item.quantity === "" ? 1 : item.quantity })),
+        .map((item: any) => ({
+          productID: item.productID,
+          quantity: item.quantity === "" ? 1 : Number(item.quantity),
+          // ✅ selectedVariant empty string → null
+          selectedVariant:
+            item.selectedVariant && item.selectedVariant !== ""
+              ? item.selectedVariant
+              : null,
+        })),
     };
-
-    if (formData.productType === "combo" && cleanedData.comboItems.length === 0) {
-      return toast.error("Please add at least one product for Combo Bundle");
-    }
 
     try {
       const submissionData = new FormData();
       Object.keys(cleanedData).forEach((key) => {
-        if (["specifications", "variants", "comboItems", "lowdown", "dimensions"].includes(key)) {
+        if (
+          [
+            "specifications",
+            "variants",
+            "comboItems",
+            "lowdown",
+            "dimensions",
+          ].includes(key)
+        ) {
           submissionData.append(key, JSON.stringify(cleanedData[key]));
-        } else if (cleanedData[key] !== undefined && cleanedData[key] !== null) {
+        } else if (
+          cleanedData[key] !== undefined &&
+          cleanedData[key] !== null
+        ) {
           submissionData.append(key, cleanedData[key]);
         }
       });
@@ -1048,7 +1195,6 @@ const ProductFormInner = () => {
       toast.error(error?.data?.message || "Something went wrong");
     }
   };
-
   const categories = categoriesData?.data || [];
   const units = unitsData?.data || [];
   const brands = brandsData?.data || [];
@@ -1058,8 +1204,14 @@ const ProductFormInner = () => {
   return (
     <form onSubmit={handleSubmit} className="max-w-7xl mx-auto space-y-8 pb-32">
       <style jsx global>{`
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"] { -moz-appearance: textfield; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
       `}</style>
 
       <ProductFormHeader
@@ -1072,7 +1224,9 @@ const ProductFormInner = () => {
 
       <ProductTypeToggle
         productType={formData.productType}
-        onChange={(type) => setFormData((p: any) => ({ ...p, productType: type }))}
+        onChange={(type) =>
+          setFormData((p: any) => ({ ...p, productType: type }))
+        }
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1081,12 +1235,14 @@ const ProductFormInner = () => {
           <ProductBasicInfo
             formData={formData}
             categories={categories}
-            units={units}
             brands={brands}
             isEditing={isEditing}
+            productType={formData.productType} // ✅ যোগ করুন
             onChange={handleChange}
-            onLowdownChange={(val) => setFormData((p: any) => ({ ...p, lowdown: val }))}
-             onTagsChange={(tags) => setFormData((p: any) => ({ ...p, tags }))}
+            onLowdownChange={(val) =>
+              setFormData((p: any) => ({ ...p, lowdown: val }))
+            }
+            onTagsChange={(tags) => setFormData((p: any) => ({ ...p, tags }))}
           />
 
           {formData.productType === "single" ? (
@@ -1107,6 +1263,9 @@ const ProductFormInner = () => {
               onComboItemChange={handleComboItemChange}
               onAddComboItem={addComboItem}
               onRemoveComboItem={removeComboItem}
+              onCostPriceChange={(cost) =>
+                setFormData((p: any) => ({ ...p, costPrice: cost }))
+              } // ✅
             />
           )}
 
@@ -1124,15 +1283,15 @@ const ProductFormInner = () => {
             thumbnailPreview={thumbnailPreview}
             galleryPreviews={galleryPreviews}
             onThumbnailSelect={handleThumbnailSelect}
-            onThumbnailRemove={() => { setThumbnailFile(null); setThumbnailPreview(""); }}
+            onThumbnailRemove={() => {
+              setThumbnailFile(null);
+              setThumbnailPreview("");
+            }}
             onGallerySelect={handleGallerySelect}
             onGalleryRemove={removeGalleryImage}
           />
 
-          <ProductSidebarPanel
-            formData={formData}
-            onChange={handleChange}
-          />
+          <ProductSidebarPanel formData={formData} onChange={handleChange} />
         </div>
       </div>
     </form>
@@ -1140,7 +1299,13 @@ const ProductFormInner = () => {
 };
 
 const ProductForm = () => (
-  <Suspense fallback={<div className="p-20 text-center text-[#4F46E5] font-bold text-sm tracking-widest">LOADING ENGINE...</div>}>
+  <Suspense
+    fallback={
+      <div className="p-20 text-center text-[#4F46E5] font-bold text-sm tracking-widest">
+        LOADING ENGINE...
+      </div>
+    }
+  >
     <ProductFormInner />
   </Suspense>
 );
