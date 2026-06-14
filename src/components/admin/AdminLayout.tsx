@@ -84,6 +84,16 @@ const menuItems = [
     ],
   },
   {
+    name: "Complaints",
+    href: "/dashboard/admin/complaints",
+    icon: FiGrid,
+    badge: null,
+    // submenu: [
+    //   { name: "All Unit", href: "/dashboard/admin/units" },
+    //   { name: "Create Unit", href: "/dashboard/admin/units/new" },
+    // ],
+  },
+  {
     name: "Orders",
     href: "/dashboard/admin/orders",
     icon: FiShoppingCart,
@@ -194,10 +204,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-700/50">
           {sidebarOpen && (
-            
             <Link href="/dashboard/admin" className="flex items-center gap-3">
-              <div
-               className="w-10 h-10 rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center font-bold text-lg shadow-md">
+              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center font-bold text-lg shadow-md">
                 M
               </div>
               <div>
@@ -413,7 +421,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </div>
 
       {/* Custom Scrollbar Styles */}
-      <style jsx global>{`
+      {/* <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
@@ -427,7 +435,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.3);
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };
