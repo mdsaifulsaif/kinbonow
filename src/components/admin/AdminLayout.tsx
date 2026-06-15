@@ -84,6 +84,16 @@ const menuItems = [
     ],
   },
   {
+    name: "Areas",
+    href: "/dashboard/admin/area",
+    icon: FiGrid,
+    badge: null,
+    submenu: [
+      { name: "All Areas", href: "/dashboard/admin/areas" },
+      { name: "Create Area", href: "/dashboard/admin/areas/new" },
+    ],
+  },
+  {
     name: "Complaints",
     href: "/dashboard/admin/complaints",
     icon: FiGrid,
@@ -92,6 +102,16 @@ const menuItems = [
     //   { name: "All Unit", href: "/dashboard/admin/units" },
     //   { name: "Create Unit", href: "/dashboard/admin/units/new" },
     // ],
+  },
+  {
+    name: "Riders",
+    href: "/dashboard/admin/riders",
+    icon: FiGrid,
+    badge: null,
+    submenu: [
+      { name: "All Riders", href: "/dashboard/admin/allriders" },
+      { name: "Create Unit", href: "/dashboard/admin/units/new" },
+    ],
   },
   {
     name: "Orders",
@@ -421,7 +441,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </div>
 
       {/* Custom Scrollbar Styles */}
-      {/* <style jsx global>{`
+      <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
@@ -435,7 +455,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.3);
         }
-      `}</style> */}
+      `}</style>
     </div>
   );
 };
