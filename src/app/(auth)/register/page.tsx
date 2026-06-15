@@ -3,22 +3,21 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useRegisterMutation } from '@/redux/api/authApi';
+import { useRegisterUserMutation } from '@/redux/api/authApi';
 import { toast } from 'react-hot-toast';
-import { FiUser, FiMail, FiLock, FiPhone, FiArrowRight, FiCheck } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
-        phone: '',
         password: '',
         confirmPassword: '',
     });
 
     const router = useRouter();
-    const [register, { isLoading }] = useRegisterMutation();
+    const [registerUser, { isLoading }] = useRegisterUserMutation();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,47 +30,42 @@ const RegisterPage = () => {
             return toast.error("Passwords do not match!");
         }
 
+        if (formData.password.length < 6) {
+            return toast.error("Password must be at least 6 characters long!");
+        }
+
         try {
-            await register({
+            await registerUser({
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
-                phone: formData.phone,
                 password: formData.password,
             }).unwrap();
 
-            toast.success('Account Created! Please login.', {
-                duration: 5000,
-                icon: '🎉',
-                style: {
-                    borderRadius: '10px',
-                    background: '#333',
-                    color: '#fff',
-                },
+            toast.success('Account Created Successfully! 🎉', {
+                duration: 4000,
             });
 
             router.push('/login');
         } catch (err: any) {
-            toast.error(err?.data?.message || 'Registration failed. Try again.', {
-                duration: 4000
-            });
+            toast.error(err?.data?.message || 'Registration failed. Please try again.');
         }
     };
 
     return (
-        <div className="bg-white p-8 rounded-md shadow-2xl shadow-gray-200 border border-gray-100 max-w-lg mx-auto">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl shadow-gray-200 border border-gray-100 max-w-lg mx-auto">
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-black text-gray-900 mb-2">Create Account</h1>
-                <p className="text-gray-500 font-medium">Join MegaShop for a better shopping experience</p>
+                <p className="text-gray-500 font-medium">Join us and start shopping smarter</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 px-1">First Name</label>
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
-                                <FiUser size={16} />
+                        <label className="block text-sm font-bold text-gray-700 mb-2">First Name</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                                <FiUser size={18} />
                             </div>
                             <input
                                 type="text"
@@ -79,32 +73,33 @@ const RegisterPage = () => {
                                 required
                                 value={formData.firstName}
                                 onChange={handleChange}
-                                className="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                                placeholder="John"
+                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
+                                placeholder="Saiful"
                             />
                         </div>
                     </div>
+
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Last Name</label>
-                        <div className="relative group">
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Last Name</label>
+                        <div className="relative">
                             <input
                                 type="text"
                                 name="lastName"
                                 required
                                 value={formData.lastName}
                                 onChange={handleChange}
-                                className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                                placeholder="Doe"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
+                                placeholder="Islam"
                             />
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Email Address</label>
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
-                            <FiMail size={16} />
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                            <FiMail size={18} />
                         </div>
                         <input
                             type="email"
@@ -112,35 +107,17 @@ const RegisterPage = () => {
                             required
                             value={formData.email}
                             onChange={handleChange}
-                            className="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                            placeholder="name@example.com"
+                            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
+                            placeholder="admin@gmail.com"
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Phone Number</label>
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
-                            <FiPhone size={16} />
-                        </div>
-                        <input
-                            type="tel"
-                            name="phone"
-                            required
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                            placeholder="+880 1XXX-XXXXXX"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Password</label>
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
-                            <FiLock size={16} />
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                            <FiLock size={18} />
                         </div>
                         <input
                             type="password"
@@ -148,17 +125,17 @@ const RegisterPage = () => {
                             required
                             value={formData.password}
                             onChange={handleChange}
-                            className="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
+                            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
                             placeholder="••••••••"
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Confirm Password</label>
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
-                            <FiLock size={16} />
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Confirm Password</label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                            <FiLock size={18} />
                         </div>
                         <input
                             type="password"
@@ -166,47 +143,35 @@ const RegisterPage = () => {
                             required
                             value={formData.confirmPassword}
                             onChange={handleChange}
-                            className="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
+                            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
                             placeholder="••••••••"
                         />
                     </div>
                 </div>
 
-                <div className="flex items-start gap-2 pt-2">
-                    <input
-                        id="terms"
-                        type="checkbox"
-                        required
-                        className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded cursor-pointer"
-                    />
-                    <label htmlFor="terms" className="text-xs text-gray-500 font-medium leading-relaxed cursor-pointer">
-                        I agree to the <Link href="/terms" className="text-[var(--color-primary)] font-bold">Terms of Service</Link> and <Link href="/privacy" className="text-[var(--color-primary)] font-bold">Privacy Policy</Link>
-                    </label>
-                </div>
-
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-md font-bold shadow-xl hover:shadow-gray-200 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-70 disabled:cursor-not-allowed group mt-4"
+                    className="w-full mt-6 flex items-center justify-center gap-2 py-4 bg-[#5CAF90] hover:bg-[#4A9A7D] text-white rounded-xl font-bold text-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {isLoading ? (
                         <>
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             Creating Account...
                         </>
                     ) : (
                         <>
                             Create Account
-                            <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                            <FiArrowRight />
                         </>
                     )}
                 </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-gray-50 text-center">
-                <p className="text-sm text-gray-500 font-medium">
+            <div className="mt-8 text-center">
+                <p className="text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link href="/login" className="text-[var(--color-primary)] font-bold hover:underline">
+                    <Link href="/login" className="text-[#5CAF90] font-bold hover:underline">
                         Sign In
                     </Link>
                 </p>

@@ -109,8 +109,8 @@ const menuItems = [
     icon: FiGrid,
     badge: null,
     submenu: [
-      { name: "All Riders", href: "/dashboard/admin/allriders" },
-      { name: "Create Unit", href: "/dashboard/admin/units/new" },
+      { name: "All Riders", href: "/dashboard/admin/riders" },
+      { name: "Rider Applications", href: "/dashboard/admin/riders/rider-applications" },
     ],
   },
   {

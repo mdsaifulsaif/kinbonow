@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLoginUserMutation } from '@/redux/api/authApi';
 import { useAppDispatch } from '@/redux/hooks';
 import { loginSuccess } from '@/redux/slices/authSlice';
-import { useLoginMutation } from '@/redux/api/authApi';
 import { toast } from 'react-hot-toast';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 
@@ -18,60 +18,52 @@ const LoginPage = () => {
 
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const [login, { isLoading }] = useLoginMutation();
+    const [loginUser, { isLoading }] = useLoginUserMutation();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+      const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const res = await login(formData).unwrap();
+            const res: any = await loginUser(formData).unwrap();
 
-            // Save to Redux
             dispatch(loginSuccess({
-                user: res.data.user,
-                token: res.data.accessToken
+                user: res.data?.user || res.user,
+                token: res.data?.accessToken || res.accessToken
             }));
 
-            // Save to LocalStorage
-            localStorage.setItem('token', res.data.accessToken);
+            const token = res.data?.accessToken || res.accessToken;
+            if (token) localStorage.setItem('token', token);
 
-            toast.success('Login Successful! Welcome back.', {
-                style: {
-                    borderRadius: '10px',
-                    background: '#333',
-                    color: '#fff',
-                },
-            });
+            toast.success('Login Successful! Welcome back 🎉');
 
-            // Redirect based on role
-            if (res.data.user.role === 'admin') {
+            const userRole = res.data?.user?.role || res.user?.role;
+
+            if (userRole === 'admin' || userRole === 'superAdmin') {
                 router.push('/dashboard/admin');
             } else {
                 router.push('/dashboard/user');
             }
         } catch (err: any) {
-            toast.error(err?.data?.message || 'Login failed. Please check credentials.', {
-                duration: 4000
-            });
+            toast.error(err?.data?.message || 'Invalid email or password');
         }
     };
 
     return (
-        <div className="bg-white p-8 rounded-md shadow-2xl shadow-gray-200 border border-gray-100">
-            <div className="text-center mb-10">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl shadow-gray-200 border border-gray-100 max-w-lg mx-auto">
+            <div className="text-center mb-8">
                 <h1 className="text-3xl font-black text-gray-900 mb-2">Welcome Back</h1>
-                <p className="text-gray-500 font-medium">Please enter your details to sign in</p>
+                <p className="text-gray-500 font-medium">Sign in to continue shopping</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Email Address</label>
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
                             <FiMail size={18} />
                         </div>
                         <input
@@ -80,21 +72,21 @@ const LoginPage = () => {
                             required
                             value={formData.email}
                             onChange={handleChange}
-                            className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                            placeholder="name@example.com"
+                            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
+                            placeholder="admin@gmail.com"
                         />
                     </div>
                 </div>
 
                 <div>
-                    <div className="flex items-center justify-between mb-2 px-1">
+                    <div className="flex items-center justify-between mb-2">
                         <label className="block text-sm font-bold text-gray-700">Password</label>
-                        <Link href="/forgot-password" title="Forgot Password" className="text-xs font-bold text-[var(--color-primary)] hover:underline">
+                        <Link href="/forgot-password" className="text-xs text-[#5CAF90] font-medium hover:underline">
                             Forgot Password?
                         </Link>
                     </div>
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
                             <FiLock size={18} />
                         </div>
                         <input
@@ -103,54 +95,42 @@ const LoginPage = () => {
                             required
                             value={formData.password}
                             onChange={handleChange}
-                            className="block w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-md text-gray-900 text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
+                            className="w-full pl-11 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#5CAF90] focus:ring-1 focus:ring-[#5CAF90] outline-none transition-all"
                             placeholder="••••••••"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                         >
                             {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                         </button>
                     </div>
                 </div>
 
-                <div className="flex items-center">
-                    <input
-                        id="remember-me"
-                        name="remember-me"
-                        type="checkbox"
-                        className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded cursor-pointer"
-                    />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600 font-medium cursor-pointer">
-                        Remember me for 30 days
-                    </label>
-                </div>
-
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-md font-bold shadow-xl hover:shadow-gray-200 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed group"
+                    className="w-full mt-6 flex items-center justify-center gap-2 py-4 bg-[#5CAF90] hover:bg-[#4A9A7D] text-white rounded-xl font-bold text-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {isLoading ? (
                         <>
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             Signing In...
                         </>
                     ) : (
                         <>
                             Sign In
-                            <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                            <FiArrowRight />
                         </>
                     )}
                 </button>
             </form>
 
-            <div className="mt-8 pt-8 border-t border-gray-50 text-center">
-                <p className="text-sm text-gray-500 font-medium">
+            <div className="mt-8 text-center">
+                <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link href="/register" className="text-[var(--color-primary)] font-bold hover:underline">
+                    <Link href="/register" className="text-[#5CAF90] font-bold hover:underline">
                         Create Account
                     </Link>
                 </p>
