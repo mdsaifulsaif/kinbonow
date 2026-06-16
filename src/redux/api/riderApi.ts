@@ -1,6 +1,5 @@
 import { baseApi } from "./baseApi";
 
-
 const riderApi = baseApi.injectEndpoints({
   endpoints: (builder: any) => ({
     // ==================== RIDER APPLICATION ====================
@@ -87,7 +86,9 @@ const riderApi = baseApi.injectEndpoints({
         url: `/rider/admin/${id}`,
         method: "GET",
       }),
-      providesTags: (_result: any, _error: any, id: string) => [{ type: "Rider", id }],
+      providesTags: (_result: any, _error: any, id: string) => [
+        { type: "Rider", id },
+      ],
     }),
 
     updateAssignedAreas: builder.mutation({
@@ -100,9 +101,10 @@ const riderApi = baseApi.injectEndpoints({
     }),
 
     toggleActiveStatus: builder.mutation({
-      query: (id: string) => ({
+      query: ({ id, isActive }: { id: string; isActive: boolean }) => ({
         url: `/rider/admin/${id}/active-status`,
         method: "PATCH",
+        body: { isActive },
       }),
       invalidatesTags: ["Rider"],
     }),
