@@ -247,11 +247,17 @@ import {
   useRejectApplicationMutation,
 } from "@/redux/api/riderApi";
 import { useGetAllAreasQuery } from "@/redux/api/areaApi";
+import ApplicationActionModal from "../components/ApplicationActionModal";
 
 const RiderApplicationsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
+
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    type: "approve" | "reject" | null;
+  }>({ isOpen: false, type: null });
 
   // Modals
   const [showApproveModal, setShowApproveModal] = useState(false);
@@ -288,6 +294,32 @@ const RiderApplicationsPage = () => {
   const openAreasModal = (app: any) => {
     setSelectedApp(app);
     setShowAreasModal(true);
+  };
+
+  // action modal handler
+  const handleAction = async (data: {
+    assignedAreas?: string[];
+    reason?: string;
+  }) => {
+    try {
+      if (modalConfig.type === "approve") {
+        await approveApplication({
+          id: selectedApp._id,
+          assignedAreas: data.assignedAreas,
+        }).unwrap();
+        toast.success("Rider Approved!");
+      } else {
+        await rejectApplication({
+          id: selectedApp._id,
+          reason: data.reason,
+        }).unwrap();
+        toast.success("Application Rejected!");
+      }
+      setModalConfig({ isOpen: false, type: null });
+      refetch();
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Operation failed");
+    }
   };
 
   const openApproveModal = (app: any) => {
@@ -536,16 +568,27 @@ const RiderApplicationsPage = () => {
                   <td className="px-6 py-4 text-right">
                     {app.status === "pending" && (
                       <div className="flex gap-2 justify-end">
+                        {/* Approve Button */}
                         <button
-                          onClick={() => openApproveModal(app)}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md font-medium transition-all"
+                          onClick={() => {
+                            setSelectedApp(app);
+                            setModalConfig({ isOpen: true, type: "approve" });
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow"
                         >
+                          <FiCheckCircle size={16} />
                           Approve
                         </button>
+
+                        {/* Reject Button */}
                         <button
-                          onClick={() => openRejectModal(app)}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md font-medium transition-all"
+                          onClick={() => {
+                            setSelectedApp(app);
+                            setModalConfig({ isOpen: true, type: "reject" });
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 text-sm rounded-lg font-medium transition-all duration-200"
                         >
+                          <FiXCircle size={16} />
                           Reject
                         </button>
                       </div>
@@ -556,6 +599,16 @@ const RiderApplicationsPage = () => {
             )}
           </tbody>
         </table>
+
+        {modalConfig.isOpen && (
+          <ApplicationActionModal
+            type={modalConfig.type}
+            app={selectedApp}
+            onClose={() => setModalConfig({ isOpen: false, type: null })}
+            onConfirm={handleAction}
+            isLoading={approving || rejecting}
+          />
+        )}
       </div>
 
       {/* Areas View Modal */}

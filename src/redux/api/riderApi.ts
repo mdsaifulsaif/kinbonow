@@ -29,18 +29,21 @@ const riderApi = baseApi.injectEndpoints({
       providesTags: ["RiderApplication"],
     }),
 
+ 
     approveApplication: builder.mutation({
-      query: (id: string) => ({
-        url: `/rider/admin/${id}/approve`,
+      query: (args: { id: string; assignedAreas: string[] }) => ({
+        url: `/rider/admin/${args.id}/approve`,
         method: "PATCH",
+        body: { assignedAreas: args.assignedAreas },
       }),
       invalidatesTags: ["RiderApplication", "Rider"],
     }),
 
     rejectApplication: builder.mutation({
-      query: (id: string) => ({
-        url: `/rider/admin/${id}/reject`,
+      query: (args: { id: string; reason: string }) => ({
+        url: `/rider/admin/${args.id}/reject`,
         method: "PATCH",
+        body: { reason: args.reason },
       }),
       invalidatesTags: ["RiderApplication"],
     }),
