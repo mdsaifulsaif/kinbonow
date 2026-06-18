@@ -83,6 +83,7 @@ const menuItems = [
       { name: "Create Unit", href: "/dashboard/admin/units/new" },
     ],
   },
+  
   {
     name: "Areas",
     href: "/dashboard/admin/area",
@@ -204,7 +205,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div suppressHydrationWarning className="min-h-screen bg-gray-50">
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
@@ -225,7 +226,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-700/50">
           {sidebarOpen && (
             <Link href="/dashboard/admin" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center font-bold text-lg shadow-md">
+              <div suppressHydrationWarning className="w-10 h-10 rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center font-bold text-lg shadow-md">
                 M
               </div>
               <div>
