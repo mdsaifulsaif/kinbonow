@@ -229,7 +229,6 @@
 
 
 
-
 "use client";
 
 import React from 'react';
@@ -242,19 +241,24 @@ import { useAppDispatch } from '@/redux';
 import { addToCart, removeFromCart, updateQuantity } from '@/redux/slices/cartSlice';
 import { addToWishlist } from '@/redux/slices/wishlistSlice';
 
-const ProductCard: React.FC<{ product: any }> = ({ product }) => {
+interface ProductCardProps {
+  product: any;
+  onClick?: () => void; // Quick-view (modal) open korar jonno — Eye icon e bosano
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
     const dispatch = useAppDispatch();
     const router = useRouter();
 
-    // ডাটাবেজ থেকে আসা ডাটা অনুযায়ী ভ্যালু ক্যালকুলেশন
+    // ডাটাবেজ থেকে আসা ডাটা অনুযায়ী ভ্যালু ক্যালকুলেশন
     const productId = product?._id;
     const regularPrice = product?.regularPrice || 0;
     const salePrice = product?.salePrice || 0;
-    
+
     // কারেন্ট প্রাইস এবং ওল্ড প্রাইস নির্ধারণ
     const currentPrice = salePrice > 0 ? salePrice : regularPrice;
     const oldPrice = salePrice > 0 ? regularPrice : null;
-    
+
     // ইমেজ এবং ক্যাটাগরি
     const productImage = product?.thumbnail || product?.images?.[0] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=800';
     const categoryName = product?.categoryID?.name || 'General';
@@ -307,6 +311,13 @@ const ProductCard: React.FC<{ product: any }> = ({ product }) => {
         }));
     };
 
+    // Quick View — Eye icon e click korle modal open hobe, product page e navigate korbe na
+    const handleQuickView = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick?.();
+    };
+
     const discountPercent = oldPrice ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100) : null;
 
     return (
@@ -329,7 +340,8 @@ const ProductCard: React.FC<{ product: any }> = ({ product }) => {
                         <button onClick={handleAddToWishlist} className='w-10 h-10 bg-white/90 backdrop-blur-sm border border-gray-100 rounded-md shadow-sm flex items-center justify-center text-gray-700 hover:bg-[var(--color-primary)] hover:text-white transition-all'>
                             <FiHeart size={18} />
                         </button>
-                        <button className='w-10 h-10 bg-white/90 backdrop-blur-sm border border-gray-100 rounded-md shadow-sm flex items-center justify-center text-gray-700 hover:bg-[var(--color-primary)] hover:text-white transition-all'>
+                        {/* Eye icon = Quick View => opens ProductModal */}
+                        <button onClick={handleQuickView} className='w-10 h-10 bg-white/90 backdrop-blur-sm border border-gray-100 rounded-md shadow-sm flex items-center justify-center text-gray-700 hover:bg-[var(--color-primary)] hover:text-white transition-all'>
                             <FiEye size={18} />
                         </button>
                     </div>
@@ -340,7 +352,7 @@ const ProductCard: React.FC<{ product: any }> = ({ product }) => {
                         <h3 className='text-gray-900 font-bold text-sm group-hover:text-[var(--color-primary)] transition-colors line-clamp-1 mb-2'>
                             {product.name}
                         </h3>
-                        
+
                         <div className='flex items-center justify-between gap-2 flex-wrap'>
                             <div className='flex items-center gap-1.5 flex-wrap'>
                                 <span className='text-gray-900 font-black text-sm sm:text-base'>৳{typeof currentPrice === 'number' ? currentPrice.toLocaleString() : '0'}</span>
