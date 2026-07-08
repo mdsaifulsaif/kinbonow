@@ -48,7 +48,8 @@ export const baseApi = createApi({
         'Rider', 
         'RiderApplication',
         'User'  ,
-        'StoreSetting'         // ← এটা যোগ করা হয়েছে (Register/Login এর জন্য)
+        'StoreSetting',
+        'Dashboard'      
     ],
     endpoints: () => ({}),
 });
