@@ -77,7 +77,7 @@ const riderApi = baseApi.injectEndpoints({
 
     getAllRiders: builder.query({
       query: (args: any = {}) => ({
-        url: "/rider/admin/roder/all",
+        url: "/rider/admin/rider/all",
         method: "GET",
         params: args,
       }),
