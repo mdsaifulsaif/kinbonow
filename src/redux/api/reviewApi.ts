@@ -78,6 +78,14 @@ export const reviewApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Reviews']
         }),
+         // ✅ Admin: Toggle Featured
+    toggleFeaturedReview: builder.mutation({
+      query: (id) => ({
+        url: `/reviews/admin/${id}/featured`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['Reviews'],
+    }),
     })
 });
 
@@ -89,5 +97,6 @@ export const {
     useDeleteReviewMutation,
     useGetProductReviewsQuery,
     useGetSingleReviewQuery,
-    useUpdateReviewMutation
+    useUpdateReviewMutation,
+      useToggleFeaturedReviewMutation,
 } = reviewApi;
