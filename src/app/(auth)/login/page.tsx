@@ -21,18 +21,19 @@ export default function LoginPage() {
       const res = await signIn("credentials", {
         email,
         password,
-        redirect: false, // ✅ manually handle redirect যাতে error দেখাতে পারি
+        redirect: false,
       });
 
       if (res?.error) {
-        toast.error(res.error || "লগিন ব্যর্থ হয়েছে");
+        toast.error("লগিন ব্যর্থ হয়েছে: " + res.error);
         setLoading(false);
         return;
       }
 
-      // ✅ role check backend session থেকেই আসবে; এখানে সরাসরি admin dashboard এ পাঠাচ্ছি
-      router.push("/dashboard/admin");
-      router.refresh();
+      toast.success("Login Successful! Welcome back.");
+
+      // ✅ রাউটার পুশ না করে সরাসরি window.location ব্যবহার করুন
+      window.location.href = "/dashboard/admin"; // অথবা শুধু "/dashboard"
     } catch (err) {
       console.error("Login error:", err);
       toast.error("কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন");
@@ -47,15 +48,24 @@ export default function LoginPage() {
           <div className="w-14 h-14 mx-auto rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center font-bold text-2xl text-white shadow-md">
             M
           </div>
-          <h1 className="text-xl font-bold text-gray-800 mt-4">MegaShop Admin</h1>
-          <p className="text-sm text-gray-500 mt-1">Sign in to your dashboard</p>
+          <h1 className="text-xl font-bold text-gray-800 mt-4">
+            MegaShop Admin
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Sign in to your dashboard
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Email
+            </label>
             <div className="relative">
-              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <FiMail
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="email"
                 required
@@ -68,9 +78,14 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Password
+            </label>
             <div className="relative">
-              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <FiLock
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="password"
                 required

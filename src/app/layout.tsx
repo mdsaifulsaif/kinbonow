@@ -1,15 +1,15 @@
-
 import type { Metadata } from "next";
 import "./globals.css";
 import { ReduxProvider } from "@/redux";
 
 export const metadata: Metadata = {
   title: "Mega Ecommerce - Best Online Shopping Experience",
-  description: "Shop the latest products with amazing deals. Premium quality products at best prices.",
+  description:
+    "Shop the latest products with amazing deals. Premium quality products at best prices.",
   keywords: "ecommerce, online shopping, best deals, products, shop",
 };
 
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import AuthSessionProvider from "@/components/providers/AuthSessionProvider";
 
 export default function RootLayout({
@@ -21,17 +21,23 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
-           <AuthSessionProvider >
-  <ReduxProvider>
-          <Toaster position="top-center" reverseOrder={false} />
-          {children}
-        </ReduxProvider>
-           </AuthSessionProvider>
-      
+        <AuthSessionProvider>
+          <ReduxProvider>
+            <Toaster position="top-center" reverseOrder={false} />
+            {children}
+          </ReduxProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );
