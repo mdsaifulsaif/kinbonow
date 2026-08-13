@@ -13,33 +13,57 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await signIn("credentials", {
+  //       email,
+  //       password,
+  //       redirect: false,
+  //     });
+
+  //     if (res?.error) {
+  //       toast.error("লগিন ব্যর্থ হয়েছে: " + res.error);
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     toast.success("Login Successful! Welcome back.");
+
+  //     // ✅ রাউটার পুশ না করে সরাসরি window.location ব্যবহার করুন
+  //     window.location.href = "/dashboard/admin"; // অথবা শুধু "/dashboard"
+  //   } catch (err) {
+  //     console.error("Login error:", err);
+  //     toast.error("কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন");
+  //     setLoading(false);
+  //   }
+  // };
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // ✅ এখানে redirect: true এবং callbackUrl ব্যবহার করুন
       const res = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/dashboard/admin", // লগইন সফল হলে সরাসরি এখানে চলে যাবে
       });
 
-      if (res?.error) {
-        toast.error("লগিন ব্যর্থ হয়েছে: " + res.error);
-        setLoading(false);
-        return;
-      }
-
-      toast.success("Login Successful! Welcome back.");
-
-      // ✅ রাউটার পুশ না করে সরাসরি window.location ব্যবহার করুন
-      window.location.href = "/dashboard/admin"; // অথবা শুধু "/dashboard"
+      // যেহেতু redirect: true দেওয়া আছে, তাই নিচের কোডগুলো সাধারণত রান হওয়ার সুযোগ পায় না (সরাসরি রিডাইরেক্ট হয়ে যায়)
     } catch (err) {
       console.error("Login error:", err);
       toast.error("কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন");
       setLoading(false);
     }
   };
+
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
