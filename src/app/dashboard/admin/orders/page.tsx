@@ -1,1086 +1,4 @@
 
-// "use client";
-
-// import React, { useState } from 'react';
-// import Link from 'next/link';
-// import {
-//     FiSearch,
-//     FiDownload,
-//     FiEye,
-//     FiTruck,
-//     FiPackage,
-//     FiClock,
-//     FiCheckCircle,
-//     FiXCircle,
-//     FiChevronLeft,
-//     FiChevronRight,
-//     FiRefreshCw,
-//     FiMoreVertical,
-// } from 'react-icons/fi';
-// import {
-//     useGetAdminOrdersQuery,
-//     useGetOrderStatsQuery,
-//     useUpdateOrderStatusMutation
-// } from '@/redux/api/orderApi';
-// import { toast } from 'react-hot-toast';
-
-// // Status Badge Component
-// const StatusBadge = ({ status }: { status: string }) => {
-//     const config: Record<string, { bg: string; text: string; icon: any }> = {
-//         pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: FiClock },
-//         confirmed: { bg: 'bg-blue-50', text: 'text-blue-700', icon: FiCheckCircle },
-//         processing: { bg: 'bg-purple-50', text: 'text-purple-700', icon: FiPackage },
-//         shipped: { bg: 'bg-indigo-50', text: 'text-indigo-700', icon: FiTruck },
-//         delivered: { bg: 'bg-green-50', text: 'text-green-700', icon: FiCheckCircle },
-//         cancelled: { bg: 'bg-red-50', text: 'text-red-700', icon: FiXCircle },
-//         returned: { bg: 'bg-gray-50', text: 'text-gray-700', icon: FiRefreshCw },
-//         out_for_delivery: { bg: 'bg-purple-50', text: 'text-purple-700', icon: FiTruck },
-//     };
-
-//     const { bg, text, icon: Icon } = config[status?.toLowerCase()] || config.pending;
-
-//     return (
-//         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold ${bg} ${text}`}>
-//             <Icon size={12} />
-//             <span className="capitalize">{status?.replace('_', ' ') || 'N/A'}</span>
-//         </span>
-//     );
-// };
-
-// // Payment Badge Component
-// const PaymentBadge = ({ status }: { status: string }) => {
-//     const colors: Record<string, string> = {
-//         pending: 'bg-yellow-100 text-yellow-700',
-//         paid: 'bg-green-100 text-green-700',
-//         failed: 'bg-red-100 text-red-700',
-//         refunded: 'bg-purple-100 text-purple-700',
-//         unpaid: 'bg-yellow-100 text-yellow-700',
-//     };
-
-//     return (
-//         <span className={`px-2 py-0.5 rounded-md text-xs font-medium capitalize ${colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-700'}`}>
-//             {status || 'N/A'}
-//         </span>
-//     );
-// };
-
-// export default function OrdersPage() {
-//     const [search, setSearch] = useState('');
-//     const [statusFilter, setStatusFilter] = useState('all');
-//     const [deliveryType, setDeliveryType] = useState('all');
-//     const [page, setPage] = useState(1);
-//     const limit = 10;
-
-//     // ✅ API Hooks
-//     const { 
-//         data: ordersData, 
-//         isLoading, 
-//         refetch,
-//         error 
-//     } = useGetAdminOrdersQuery({
-//         page,
-//         limit,
-//         status: statusFilter !== 'all' ? statusFilter : undefined,
-//         search: search || undefined,
-//         deliveryType: deliveryType !== 'all' ? deliveryType : undefined,
-//     });
-
-//     // ⚠️ Stats API না থাকলে কমেন্ট করুন
-//     // const { data: statsData } = useGetOrderStatsQuery({});
-//     const [updateStatus] = useUpdateOrderStatusMutation();
-
-//     // ✅ সঠিকভাবে ডেটা এক্সট্রাক্ট করুন - আপনার API ফরম্যাট অনুযায়ী
-//     const orders = Array.isArray(ordersData?.data?.orders) ? ordersData.data.orders : [];
-//     const totalOrders = ordersData?.data?.total || 0;
-//     const currentPage = ordersData?.data?.page || 1;
-//     const totalPages = Math.ceil(totalOrders / limit) || 1;
-
-//     const formatDate = (dateString: string) => {
-//         if (!dateString) return 'N/A';
-//         try {
-//             return new Date(dateString).toLocaleDateString('en-US', {
-//                 day: 'numeric',
-//                 month: 'short',
-//                 year: 'numeric',
-//                 hour: '2-digit',
-//                 minute: '2-digit',
-//             });
-//         } catch {
-//             return 'Invalid Date';
-//         }
-//     };
-
-//     // ✅ Status Update Handler
-//     const handleStatusUpdate = async (orderId: string, newStatus: string) => {
-//         try {
-//             await updateStatus({ id: orderId, status: newStatus }).unwrap();
-//             toast.success(`Order status updated to ${newStatus}`);
-//             refetch();
-//         } catch (error: any) {
-//             toast.error(error?.data?.message || 'Failed to update status');
-//         }
-//     };
-
-//     // ✅ Stats ডেটা (যদি API না থাকে তাহলে ডামি ডেটা)
-//     const statsConfig = [
-//         { label: 'All Orders', value: totalOrders || 0, color: 'text-gray-700', bg: 'bg-white', key: 'all' },
-//         { label: 'Pending', value: orders.filter((o: any) => o.status === 'pending').length || 0, color: 'text-yellow-700', bg: 'bg-yellow-50', key: 'pending' },
-//         { label: 'Confirmed', value: orders.filter((o: any) => o.status === 'confirmed').length || 0, color: 'text-blue-700', bg: 'bg-blue-50', key: 'confirmed' },
-//         { label: 'Processing', value: orders.filter((o: any) => o.status === 'processing').length || 0, color: 'text-purple-700', bg: 'bg-purple-50', key: 'processing' },
-//         { label: 'Out for Delivery', value: orders.filter((o: any) => o.status === 'out_for_delivery').length || 0, color: 'text-purple-700', bg: 'bg-purple-50', key: 'out_for_delivery' },
-//         { label: 'Delivered', value: orders.filter((o: any) => o.status === 'delivered').length || 0, color: 'text-green-700', bg: 'bg-green-50', key: 'delivered' },
-//         { label: 'Cancelled', value: orders.filter((o: any) => o.status === 'cancelled').length || 0, color: 'text-red-700', bg: 'bg-red-50', key: 'cancelled' },
-//     ];
-
-//     // ✅ Error State
-//     if (error) {
-//         return (
-//             <div className="p-6 bg-white rounded-lg border border-red-200 shadow-sm">
-//                 <div className="text-center py-12">
-//                     <FiXCircle size={48} className="mx-auto text-red-400 mb-4" />
-//                     <h3 className="text-lg font-semibold text-red-600">Failed to load orders</h3>
-//                     <p className="text-gray-500 mt-2">Please try again later</p>
-//                     <button 
-//                         onClick={() => refetch()}
-//                         className="mt-4 px-4 py-2 bg-[#5CAF90] text-white rounded-md hover:bg-[#4A9A7D] transition-colors"
-//                     >
-//                         Retry
-//                     </button>
-//                 </div>
-//             </div>
-//         );
-//     }
-
-//     return (
-//         <div className="space-y-6">
-//             {/* Page Header */}
-//             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-//                 <div>
-//                     <h1 className="text-2xl font-bold text-gray-800">Orders Management</h1>
-//                     <p className="text-sm text-gray-500 mt-1">Manage and track all customer orders</p>
-//                 </div>
-//                 <div className="flex gap-3 flex-wrap">
-//                     <button
-//                         onClick={() => refetch()}
-//                         className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm"
-//                     >
-//                         <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
-//                         Refresh
-//                     </button>
-//                     <button className="px-5 py-2.5 bg-[#5CAF90] text-white rounded-md text-sm font-semibold hover:bg-[#4A9A7D] transition-all shadow-md flex items-center gap-2">
-//                         <FiDownload size={16} />
-//                         Export
-//                     </button>
-//                 </div>
-//             </div>
-
-//             {/* Stats Cards */}
-//             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
-//                 {statsConfig.map((stat, i) => (
-//                     <div
-//                         key={i}
-//                         className={`${stat.bg} border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-//                             statusFilter === stat.key ? 'ring-2 ring-[#5CAF90] border-transparent' : 'border-gray-200'
-//                         }`}
-//                         onClick={() => {
-//                             setStatusFilter(stat.key);
-//                             setPage(1);
-//                         }}
-//                     >
-//                         <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-//                         <p className={`text-xs ${stat.color} opacity-80 font-medium truncate`}>{stat.label}</p>
-//                     </div>
-//                 ))}
-//             </div>
-
-//             {/* Filters */}
-//             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4">
-//                 <div className="flex-1 relative">
-//                     <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-//                     <input
-//                         type="text"
-//                         placeholder="Search by order number or customer..."
-//                         value={search}
-//                         onChange={(e) => setSearch(e.target.value)}
-//                         className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-1 focus:ring-[#5CAF90]/20 focus:border-[#5CAF90] focus:bg-white transition-all outline-none text-sm"
-//                     />
-//                 </div>
-
-//                 <div className="flex gap-3 flex-wrap">
-//                     <select
-//                         value={statusFilter}
-//                         onChange={(e) => {
-//                             setStatusFilter(e.target.value);
-//                             setPage(1);
-//                         }}
-//                         className="px-4 py-2.5 border border-gray-200 rounded-md focus:ring-1 focus:ring-[#5CAF90]/20 focus:border-[#5CAF90] transition-all outline-none text-sm bg-white min-w-[140px]"
-//                     >
-//                         <option value="all">All Status</option>
-//                         <option value="pending">Pending</option>
-//                         <option value="confirmed">Confirmed</option>
-//                         <option value="processing">Processing</option>
-//                         <option value="out_for_delivery">Out for Delivery</option>
-//                         <option value="delivered">Delivered</option>
-//                         <option value="cancelled">Cancelled</option>
-//                         <option value="returned">Returned</option>
-//                     </select>
-
-//                     <select
-//                         value={deliveryType}
-//                         onChange={(e) => {
-//                             setDeliveryType(e.target.value);
-//                             setPage(1);
-//                         }}
-//                         className="px-4 py-2.5 border border-gray-200 rounded-md focus:ring-1 focus:ring-[#5CAF90]/20 focus:border-[#5CAF90] transition-all outline-none text-sm bg-white min-w-[140px]"
-//                     >
-//                         <option value="all">All Delivery</option>
-//                         <option value="local">Local</option>
-//                         <option value="delivery">Delivery</option>
-//                         <option value="pickup">Pickup</option>
-//                     </select>
-//                 </div>
-//             </div>
-
-//             {/* Orders Table */}
-//             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-//                 <div className="overflow-x-auto">
-//                     <table className="w-full text-left">
-//                         <thead className="bg-gray-50 border-b border-gray-100">
-//                             <tr>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order</th>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Items</th>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment</th>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-//                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-//                                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-//                             </tr>
-//                         </thead>
-//                         <tbody className="divide-y divide-gray-100">
-//                             {isLoading ? (
-//                                 [...Array(5)].map((_, i) => (
-//                                     <tr key={i} className="animate-pulse">
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-24"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-32"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-16"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-20"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-16"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-20"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-24"></div></td>
-//                                         <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-10 ml-auto"></div></td>
-//                                     </tr>
-//                                 ))
-//                             ) : orders.length === 0 ? (
-//                                 <tr>
-//                                     <td colSpan={8} className="px-6 py-12 text-center">
-//                                         <FiPackage size={48} className="mx-auto text-gray-200 mb-4" />
-//                                         <p className="text-gray-500">No orders found</p>
-//                                     </td>
-//                                 </tr>
-//                             ) : (
-//                                 orders.map((order: any) => (
-//                                     <tr key={order?._id} className="hover:bg-gray-50/50 transition-colors">
-//                                         <td className="px-6 py-4">
-//                                             <p className="font-semibold text-[#5CAF90]">{order?.orderNumber || 'N/A'}</p>
-//                                             <p className="text-[10px] text-gray-400 font-medium">
-//                                                 {order?.deliveryType?.toUpperCase() || 'N/A'}
-//                                             </p>
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <p className="font-medium text-gray-800">
-//                                                 {order?.userID?.name || order?.deliveryAddress?.name || 'Unknown'}
-//                                             </p>
-//                                             <p className="text-xs text-gray-400">{order?.userID?.email || 'No email'}</p>
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <p className="text-sm text-gray-600">
-//                                                 {Array.isArray(order?.items) ? order.items.length : 0}
-//                                             </p>
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <p className="font-bold text-gray-800">
-//                                                 ৳{order?.totalAmount?.toFixed(2) || '0.00'}
-//                                             </p>
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <PaymentBadge status={order?.paymentStatus} />
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <StatusBadge status={order?.status} />
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <p className="text-sm text-gray-600">{formatDate(order?.createdAt)}</p>
-//                                         </td>
-//                                         <td className="px-6 py-4">
-//                                             <div className="flex items-center justify-end gap-2">
-//                                                 <Link
-//                                                     href={`/dashboard/admin/orders/${order?._id}`}
-//                                                     className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-[#5CAF90] transition-all"
-//                                                 >
-//                                                     <FiEye size={18} />
-//                                                 </Link>
-                                                
-//                                                 <select
-//                                                     value={order?.status || 'pending'}
-//                                                     onChange={(e) => handleStatusUpdate(order?._id, e.target.value)}
-//                                                     className="text-xs border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#5CAF90]"
-//                                                 >
-//                                                     <option value="pending">Pending</option>
-//                                                     <option value="confirmed">Confirmed</option>
-//                                                     <option value="processing">Processing</option>
-//                                                     <option value="out_for_delivery">Out for Delivery</option>
-//                                                     <option value="delivered">Delivered</option>
-//                                                     <option value="cancelled">Cancelled</option>
-//                                                 </select>
-//                                             </div>
-//                                         </td>
-//                                     </tr>
-//                                 ))
-//                             )}
-//                         </tbody>
-//                     </table>
-//                 </div>
-
-//                 {/* Pagination */}
-//                 {totalPages > 1 && (
-//                     <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
-//                         <p className="text-sm text-gray-500 font-medium">
-//                             Showing {orders.length} of {totalOrders} orders
-//                         </p>
-//                         <div className="flex items-center gap-2">
-//                             <button
-//                                 onClick={() => setPage(p => Math.max(1, p - 1))}
-//                                 disabled={currentPage === 1}
-//                                 className="p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-//                             >
-//                                 <FiChevronLeft size={18} />
-//                             </button>
-//                             <div className="flex items-center gap-1">
-//                                 {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((p) => (
-//                                     <button
-//                                         key={p}
-//                                         onClick={() => setPage(p)}
-//                                         className={`w-8 h-8 rounded-md text-sm font-medium transition-all ${
-//                                             currentPage === p
-//                                                 ? 'bg-[#5CAF90] text-white shadow-md'
-//                                                 : 'text-gray-600 hover:bg-gray-100'
-//                                         }`}
-//                                     >
-//                                         {p}
-//                                     </button>
-//                                 ))}
-//                             </div>
-//                             <button
-//                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-//                                 disabled={currentPage === totalPages}
-//                                 className="p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-//                             >
-//                                 <FiChevronRight size={18} />
-//                             </button>
-//                         </div>
-//                     </div>
-//                 )}
-//             </div>
-//         </div>
-//     );
-// }
-
-
-
-// "use client";
-
-// import React, { useMemo, useState } from "react";
-// import Link from "next/link";
-// import {
-//     FiSearch,
-//     FiDownload,
-//     FiEye,
-//     FiEdit2,
-//     FiTrash2,
-//     FiTruck,
-//     FiPackage,
-//     FiClock,
-//     FiCheckCircle,
-//     FiXCircle,
-//     FiChevronLeft,
-//     FiChevronRight,
-//     FiRefreshCw,
-//     FiCopy,
-//     FiMessageSquare,
-//     FiPlus,
-//     FiSliders,
-//     FiCalendar,
-//     FiUser,
-// } from "react-icons/fi";
-// import { FaWhatsapp } from "react-icons/fa";
-// import {
-//     useGetAdminOrdersQuery,
-//     useUpdateOrderStatusMutation,
-//     useUpdatePaymentStatusMutation,
-//     // useAssignRiderMutation,
-// } from "@/redux/api/orderApi";
-// // ⚠️ Assumption: you have a riders API slice similar to orderApi.
-// // If the hook name/path is different in your project, just update this one import.
-// // import { useGetRidersQuery } from "@/redux/api/riderApi";
-// import { toast } from "react-hot-toast";
-// import { useAssignRiderMutation, useGetAllRidersQuery } from "@/redux/api/riderApi";
-
-// const BRAND = "#5CAF90";
-// const BRAND_DARK = "#4A9A7D";
-
-// // ---- These MUST mirror your Order model enums exactly (order.model.ts) ----
-// const ORDER_STATUSES = [
-//     "pending",
-//     "confirmed",
-//     "processing",
-//     "shipped",
-//     "out_for_delivery",
-//     "delivered",
-//     "cancelled",
-//     "returned",
-// ] as const;
-
-// const PAYMENT_STATUSES = ["unpaid", "paid", "partially_paid", "refunded"] as const;
-
-// const DELIVERY_TYPES = ["local", "nationwide"] as const;
-
-// // -----------------------------------------------------------------------
-
-// const StatusBadge = ({ status }: { status: string }) => {
-//     const config: Record<string, { bg: string; text: string; icon: any }> = {
-//         pending: { bg: "bg-yellow-50", text: "text-yellow-700", icon: FiClock },
-//         confirmed: { bg: "bg-blue-50", text: "text-blue-700", icon: FiCheckCircle },
-//         processing: { bg: "bg-purple-50", text: "text-purple-700", icon: FiPackage },
-//         shipped: { bg: "bg-indigo-50", text: "text-indigo-700", icon: FiTruck },
-//         out_for_delivery: { bg: "bg-purple-50", text: "text-purple-700", icon: FiTruck },
-//         delivered: { bg: "bg-green-50", text: "text-green-700", icon: FiCheckCircle },
-//         cancelled: { bg: "bg-red-50", text: "text-red-700", icon: FiXCircle },
-//         returned: { bg: "bg-gray-50", text: "text-gray-700", icon: FiRefreshCw },
-//     };
-//     const { bg, text, icon: Icon } = config[status?.toLowerCase()] || config.pending;
-//     return (
-//         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold ${bg} ${text}`}>
-//             <Icon size={12} />
-//             <span className="capitalize">{status?.replace(/_/g, " ") || "N/A"}</span>
-//         </span>
-//     );
-// };
-
-// const PaymentBadge = ({ status }: { status: string }) => {
-//     const colors: Record<string, string> = {
-//         unpaid: "bg-yellow-100 text-yellow-700",
-//         paid: "bg-green-100 text-green-700",
-//         partially_paid: "bg-orange-100 text-orange-700",
-//         refunded: "bg-purple-100 text-purple-700",
-//     };
-//     return (
-//         <span className={`px-2 py-0.5 rounded-md text-xs font-medium capitalize ${colors[status?.toLowerCase()] || "bg-gray-100 text-gray-700"}`}>
-//             {status?.replace(/_/g, " ") || "N/A"}
-//         </span>
-//     );
-// };
-
-// const daysAgo = (dateString?: string) => {
-//     if (!dateString) return null;
-//     const diffMs = Date.now() - new Date(dateString).getTime();
-//     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-//     if (days < 0) return null;
-//     return `${days} day${days === 1 ? "" : "s"} ago`;
-// };
-
-// const formatDateTime = (dateString?: string) => {
-//     if (!dateString) return "N/A";
-//     try {
-//         return new Date(dateString).toLocaleDateString("en-US", {
-//             day: "numeric",
-//             month: "short",
-//             year: "numeric",
-//         });
-//     } catch {
-//         return "Invalid Date";
-//     }
-// };
-
-// const formatTimeOnly = (dateString?: string) => {
-//     if (!dateString) return null;
-//     try {
-//         return new Date(dateString).toLocaleTimeString("en-US", {
-//             hour: "2-digit",
-//             minute: "2-digit",
-//         });
-//     } catch {
-//         return null;
-//     }
-// };
-
-// export default function OrdersPage() {
-//     const [search, setSearch] = useState("");
-//     const [statusFilter, setStatusFilter] = useState("all");
-//     const [paymentFilter, setPaymentFilter] = useState("all");
-//     const [deliveryType, setDeliveryType] = useState("all");
-//     const [page, setPage] = useState(1);
-//     const [limit, setLimit] = useState(10);
-
-//     const {
-//         data: ordersData,
-//         isLoading,
-//         refetch,
-//         error,
-//     } = useGetAdminOrdersQuery({
-//         page,
-//         limit,
-//         status: statusFilter !== "all" ? statusFilter : undefined,
-//         paymentStatus: paymentFilter !== "all" ? paymentFilter : undefined,
-//         search: search || undefined,
-//         deliveryType: deliveryType !== "all" ? deliveryType : undefined,
-//     });
-
-//     // Riders you manage in-house (not a 3rd-party courier)
-// // Riders you manage in-house (not a 3rd-party courier)
-// const { data: ridersData } = useGetAllRidersQuery({}) as { data: any };
-// const riders = Array.isArray(ridersData?.data) ? ridersData.data : [];
-
-//     const [updateStatus] = useUpdateOrderStatusMutation();
-//     const [updatePaymentStatus] = useUpdatePaymentStatusMutation();
-//     const [assignRider] = useAssignRiderMutation();
-
-//     const orders = Array.isArray(ordersData?.data?.orders) ? ordersData.data.orders : [];
-//     const totalOrders = ordersData?.data?.total || 0;
-//     const currentPage = ordersData?.data?.page || 1;
-//     const totalPages = Math.ceil(totalOrders / limit) || 1;
-
-//     const handleStatusUpdate = async (orderId: string, newStatus: string) => {
-//         try {
-//             await updateStatus({ id: orderId, status: newStatus }).unwrap();
-//             toast.success(`Order status updated to ${newStatus.replace(/_/g, " ")}`);
-//             refetch();
-//         } catch (err: any) {
-//             toast.error(err?.data?.message || "Failed to update status");
-//         }
-//     };
-
-//     const handlePaymentUpdate = async (orderId: string, newStatus: string) => {
-//         try {
-//             await updatePaymentStatus({ id: orderId, paymentStatus: newStatus }).unwrap();
-//             toast.success(`Payment status updated to ${newStatus.replace(/_/g, " ")}`);
-//             refetch();
-//         } catch (err: any) {
-//             toast.error(err?.data?.message || "Failed to update payment status");
-//         }
-//     };
-
-//     const handleRiderAssign = async (orderId: string, riderID: string) => {
-//         try {
-//             await assignRider({ id: orderId, riderID: riderID || null }).unwrap();
-//             toast.success(riderID ? "Rider assigned" : "Rider unassigned");
-//             refetch();
-//         } catch (err: any) {
-//             toast.error(err?.data?.message || "Failed to assign rider");
-//         }
-//     };
-
-//     const handleCopy = (text: string) => {
-//         navigator.clipboard.writeText(text);
-//         toast.success("Copied");
-//     };
-
-//     // Quick-select counters — based on the currently loaded page.
-//     // Wire this up to a real /orders/stats endpoint for accurate totals across all pages.
-//     const statusCounts = useMemo(() => {
-//         const counts: Record<string, number> = { all: totalOrders };
-//         ORDER_STATUSES.forEach((s) => {
-//             counts[s] = orders.filter((o: any) => o.status === s).length;
-//         });
-//         return counts;
-//     }, [orders, totalOrders]);
-
-//     const paymentCounts = useMemo(() => {
-//         const counts: Record<string, number> = {};
-//         PAYMENT_STATUSES.forEach((s) => {
-//             counts[s] = orders.filter((o: any) => o.paymentStatus === s).length;
-//         });
-//         return counts;
-//     }, [orders]);
-
-//     const topStats = [
-//         {
-//             label: "Pending Order",
-//             sub: "Awaiting confirmation",
-//             value: statusCounts.pending || 0,
-//             icon: FiClock,
-//         },
-//         {
-//             label: "On The Way",
-//             sub: "Processing or in transit",
-//             value:
-//                 (statusCounts.processing || 0) +
-//                 (statusCounts.shipped || 0) +
-//                 (statusCounts.out_for_delivery || 0),
-//             icon: FiTruck,
-//         },
-//         {
-//             label: "Done Order",
-//             sub: "Delivered",
-//             value: statusCounts.delivered || 0,
-//             icon: FiCheckCircle,
-//         },
-//         {
-//             label: "Order Rejected",
-//             sub: "Cancelled / returned",
-//             value: (statusCounts.cancelled || 0) + (statusCounts.returned || 0),
-//             icon: FiXCircle,
-//         },
-//     ];
-
-//     const quickSelectPills = [
-//         { key: "all", label: "All", count: statusCounts.all },
-//         ...ORDER_STATUSES.map((s) => ({ key: s, label: s.replace(/_/g, " "), count: statusCounts[s] })),
-//     ];
-
-//     const paymentPills = PAYMENT_STATUSES.map((s) => ({
-//         key: s,
-//         label: s.replace(/_/g, " "),
-//         count: paymentCounts[s] || 0,
-//     }));
-
-//     if (error) {
-//         return (
-//             <div className="p-6 bg-white rounded-lg border border-red-200 shadow-sm">
-//                 <div className="text-center py-12">
-//                     <FiXCircle size={48} className="mx-auto text-red-400 mb-4" />
-//                     <h3 className="text-lg font-semibold text-red-600">Failed to load orders</h3>
-//                     <p className="text-gray-500 mt-2">Please try again later</p>
-//                     <button
-//                         onClick={() => refetch()}
-//                         className="mt-4 px-4 py-2 rounded-md text-white transition-colors"
-//                         style={{ backgroundColor: BRAND }}
-//                     >
-//                         Retry
-//                     </button>
-//                 </div>
-//             </div>
-//         );
-//     }
-
-//     return (
-//         <div className="space-y-6">
-//             {/* Page Header */}
-//             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//                 <div>
-//                     <h1 className="text-2xl font-bold text-gray-800">Orders</h1>
-//                     <p className="text-sm text-gray-500 mt-1">Track, filter, and manage all store orders from one place.</p>
-//                 </div>
-//                 <div className="flex gap-3 flex-wrap">
-//                     <button
-//                         onClick={() => refetch()}
-//                         className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm"
-//                     >
-//                         <FiRefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
-//                         Refresh
-//                     </button>
-//                     <button className="px-5 py-2.5 text-white rounded-md text-sm font-semibold hover:opacity-90 transition-all shadow-md flex items-center gap-2" style={{ backgroundColor: "#0f172a" }}>
-//                         <FiDownload size={16} />
-//                         Export
-//                     </button>
-//                 </div>
-//             </div>
-
-//             {/* Top Summary Cards */}
-//             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-//                 {topStats.map((stat, i) => (
-//                     <div key={i} className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-//                         <div className="flex items-center justify-between mb-3">
-//                             <div className="w-9 h-9 rounded-md bg-gray-50 flex items-center justify-center text-gray-500">
-//                                 <stat.icon size={16} />
-//                             </div>
-//                         </div>
-//                         <p className="text-sm font-medium text-gray-700">{stat.label}</p>
-//                         <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
-//                         <p className="text-xs text-gray-400 mt-1">{stat.sub}</p>
-//                     </div>
-//                 ))}
-//             </div>
-
-//             {/* Orders List */}
-//             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-//                 <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100">
-//                     <div>
-//                         <h2 className="text-lg font-bold text-gray-800">Orders List</h2>
-//                     </div>
-//                     <div className="flex flex-wrap items-center gap-3">
-//                         <div className="relative">
-//                             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-//                             <input
-//                                 type="text"
-//                                 placeholder="Search..."
-//                                 value={search}
-//                                 onChange={(e) => {
-//                                     setSearch(e.target.value);
-//                                     setPage(1);
-//                                 }}
-//                                 className="pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-1 focus:ring-[#5CAF90]/20 focus:border-[#5CAF90] focus:bg-white transition-all outline-none text-sm w-48"
-//                             />
-//                         </div>
-
-//                         <select
-//                             value={deliveryType}
-//                             onChange={(e) => {
-//                                 setDeliveryType(e.target.value);
-//                                 setPage(1);
-//                             }}
-//                             className="px-3 py-2.5 border border-gray-200 rounded-md focus:ring-1 focus:ring-[#5CAF90]/20 focus:border-[#5CAF90] transition-all outline-none text-sm bg-white"
-//                         >
-//                             <option value="all">All Delivery</option>
-//                             {DELIVERY_TYPES.map((t) => (
-//                                 <option key={t} value={t} className="capitalize">
-//                                     {t}
-//                                 </option>
-//                             ))}
-//                         </select>
-
-//                         <button className="px-4 py-2.5 border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all bg-white">
-//                             <FiSliders size={16} />
-//                             Filter
-//                         </button>
-
-//                         <button className="px-4 py-2.5 text-white rounded-md text-sm font-semibold hover:opacity-90 transition-all shadow-md flex items-center gap-2" style={{ backgroundColor: BRAND }}>
-//                             <FiPlus size={16} />
-//                             Create Order
-//                         </button>
-//                     </div>
-//                 </div>
-
-//                 {/* Quick select pills */}
-//                 <div className="px-5 py-4 border-b border-gray-100">
-//                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Quick select</p>
-//                     <div className="flex flex-wrap gap-2">
-//                         {quickSelectPills.map((pill) => (
-//                             <button
-//                                 key={pill.key}
-//                                 onClick={() => {
-//                                     setStatusFilter(pill.key);
-//                                     setPage(1);
-//                                 }}
-//                                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border capitalize transition-all ${
-//                                     statusFilter === pill.key
-//                                         ? "text-white border-transparent"
-//                                         : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-//                                 }`}
-//                                 style={statusFilter === pill.key ? { backgroundColor: "#0f172a" } : {}}
-//                             >
-//                                 {pill.label} - ({pill.count})
-//                             </button>
-//                         ))}
-//                         <span className="w-px bg-gray-200 mx-1" />
-//                         {paymentPills.map((pill) => (
-//                             <button
-//                                 key={pill.key}
-//                                 onClick={() => {
-//                                     setPaymentFilter(paymentFilter === pill.key ? "all" : pill.key);
-//                                     setPage(1);
-//                                 }}
-//                                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border capitalize transition-all ${
-//                                     paymentFilter === pill.key
-//                                         ? "border-transparent text-white"
-//                                         : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-//                                 }`}
-//                                 style={paymentFilter === pill.key ? { backgroundColor: BRAND } : {}}
-//                             >
-//                                 {pill.label} - ({pill.count})
-//                             </button>
-//                         ))}
-//                     </div>
-//                 </div>
-
-//                 {/* Table */}
-//                 <div className="overflow-x-auto">
-//                     <table className="w-full text-left">
-//                         <thead className="bg-gray-50 border-b border-gray-100">
-//                             <tr>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rider</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Delivery Slot</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">SMS</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Status</th>
-//                                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment</th>
-//                                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
-//                             </tr>
-//                         </thead>
-//                         <tbody className="divide-y divide-gray-100">
-//                             {isLoading ? (
-//                                 [...Array(5)].map((_, i) => (
-//                                     <tr key={i} className="animate-pulse">
-//                                         {Array.from({ length: 11 }).map((__, j) => (
-//                                             <td key={j} className="px-4 py-4">
-//                                                 <div className="h-4 bg-gray-100 rounded w-16" />
-//                                             </td>
-//                                         ))}
-//                                     </tr>
-//                                 ))
-//                             ) : orders.length === 0 ? (
-//                                 <tr>
-//                                     <td colSpan={11} className="px-6 py-12 text-center">
-//                                         <FiPackage size={48} className="mx-auto text-gray-200 mb-4" />
-//                                         <p className="text-gray-500">No orders found</p>
-//                                     </td>
-//                                 </tr>
-//                             ) : (
-//                                 orders.map((order: any, idx: number) => {
-//                                     const ago = daysAgo(order?.createdAt);
-//                                     const slotDate = order?.deliveryDate || order?.estimatedDelivery;
-//                                     return (
-//                                         <tr key={order?._id} className="hover:bg-gray-50/50 transition-colors align-top">
-//                                             <td className="px-4 py-4 text-sm text-gray-500">
-//                                                 {(currentPage - 1) * limit + idx + 1}
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <p className="font-semibold" style={{ color: BRAND }}>
-//                                                     {order?.orderNumber || "N/A"}
-//                                                 </p>
-//                                                 <p className="text-xs text-gray-500">{formatDateTime(order?.createdAt)}</p>
-//                                                 {ago && <p className="text-[10px] text-orange-500 font-medium">{ago}</p>}
-//                                                 <p className="text-[10px] text-gray-400 font-medium uppercase">
-//                                                     {order?.deliveryType || "N/A"}
-//                                                 </p>
-//                                                 <button
-//                                                     onClick={() => handleCopy(order?.orderNumber)}
-//                                                     className="mt-1 text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-1"
-//                                                 >
-//                                                     <FiCopy size={11} /> Copy
-//                                                 </button>
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <p className="font-medium text-gray-800">
-//                                                     {order?.userID?.name || order?.deliveryAddress?.name || "Unknown"}
-//                                                 </p>
-//                                                 <p className="text-xs text-gray-400 flex items-center gap-1.5 mt-0.5">
-//                                                     {order?.deliveryAddress?.phone || order?.userID?.phone || "No phone"}
-//                                                     {order?.deliveryAddress?.phone && (
-//                                                         <>
-//                                                             <FiCopy
-//                                                                 size={11}
-//                                                                 className="cursor-pointer hover:text-gray-600"
-//                                                                 onClick={() => handleCopy(order.deliveryAddress.phone)}
-//                                                             />
-//                                                             <FaWhatsapp size={12} className="text-green-500" />
-//                                                         </>
-//                                                     )}
-//                                                 </p>
-//                                                 <p className="text-[11px] text-gray-400 mt-1 max-w-[180px]">
-//                                                     {[
-//                                                         order?.deliveryAddress?.houseNo,
-//                                                         order?.deliveryAddress?.road,
-//                                                         order?.deliveryAddress?.upazila,
-//                                                         order?.deliveryAddress?.city,
-//                                                     ]
-//                                                         .filter(Boolean)
-//                                                         .join(", ") || "No address"}
-//                                                 </p>
-//                                             </td>
-
-//                                             <td className="px-4 py-4 text-sm text-gray-600">
-//                                                 {Array.isArray(order?.items) && order.items.length > 0 ? (
-//                                                     <ul className="space-y-0.5">
-//                                                         {order.items.slice(0, 3).map((it: any, i: number) => (
-//                                                             <li key={i} className="whitespace-nowrap">
-//                                                                 {i + 1}. {it.productName} <span className="text-gray-400">x{it.quantity}</span>
-//                                                             </li>
-//                                                         ))}
-//                                                         {order.items.length > 3 && (
-//                                                             <li className="text-gray-400">+{order.items.length - 3} more</li>
-//                                                         )}
-//                                                     </ul>
-//                                                 ) : (
-//                                                     "N/A"
-//                                                 )}
-//                                             </td>
-
-//                                             <td className="px-4 py-4 text-xs text-gray-500 whitespace-nowrap">
-//                                                 <p>Ship: ৳{(order?.shippingCharge ?? 0).toFixed(2)}</p>
-//                                                 <p>Disc: ৳{(order?.discountAmount ?? 0).toFixed(2)}</p>
-//                                                 <p className="font-bold text-gray-800 text-sm mt-0.5">
-//                                                     Tot: ৳{(order?.totalAmount ?? 0).toFixed(2)}
-//                                                 </p>
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <select
-//                                                     value={order?.assignedRider?._id || order?.assignedRider || ""}
-//                                                     onChange={(e) => handleRiderAssign(order?._id, e.target.value)}
-//                                                     className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] w-32"
-//                                                 >
-//                                                     <option value="">Unassigned</option>
-//                                                     {riders.map((r: any) => (
-//                                                         <option key={r._id} value={r._id}>
-//                                                             {r.name}
-//                                                         </option>
-//                                                     ))}
-//                                                 </select>
-//                                                 <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
-//                                                     <FiUser size={10} />
-//                                                     {order?.riderAssignedAt ? formatDateTime(order.riderAssignedAt) : "Not assigned"}
-//                                                 </p>
-//                                             </td>
-
-//                                             <td className="px-4 py-4 text-xs text-gray-600 whitespace-nowrap">
-//                                                 {slotDate ? (
-//                                                     <>
-//                                                         <p className="flex items-center gap-1 font-medium text-gray-700">
-//                                                             <FiCalendar size={11} /> {formatDateTime(slotDate)}
-//                                                         </p>
-//                                                         <p className="capitalize text-gray-500">
-//                                                             {order?.preferredDeliveryTime || order?.deliveryTime || formatTimeOnly(slotDate) || "Any time"}
-//                                                         </p>
-//                                                     </>
-//                                                 ) : (
-//                                                     <span className="text-gray-400">Not scheduled</span>
-//                                                 )}
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <button className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
-//                                                     <FiMessageSquare size={16} />
-//                                                 </button>
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <select
-//                                                     value={order?.status || "pending"}
-//                                                     onChange={(e) => handleStatusUpdate(order?._id, e.target.value)}
-//                                                     className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] capitalize"
-//                                                 >
-//                                                     {ORDER_STATUSES.map((s) => (
-//                                                         <option key={s} value={s} className="capitalize">
-//                                                             {s.replace(/_/g, " ")}
-//                                                         </option>
-//                                                     ))}
-//                                                 </select>
-//                                                 <div className="mt-1.5">
-//                                                     <StatusBadge status={order?.status} />
-//                                                 </div>
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <p className="text-xs font-semibold uppercase text-gray-600">
-//                                                     {order?.paymentMethod || "N/A"}
-//                                                 </p>
-//                                                 <select
-//                                                     value={order?.paymentStatus || "unpaid"}
-//                                                     onChange={(e) => handlePaymentUpdate(order?._id, e.target.value)}
-//                                                     className="text-xs border border-gray-200 rounded-md px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] capitalize"
-//                                                 >
-//                                                     {PAYMENT_STATUSES.map((s) => (
-//                                                         <option key={s} value={s} className="capitalize">
-//                                                             {s.replace(/_/g, " ")}
-//                                                         </option>
-//                                                     ))}
-//                                                 </select>
-//                                                 <div className="mt-1">
-//                                                     <PaymentBadge status={order?.paymentStatus} />
-//                                                 </div>
-//                                             </td>
-
-//                                             <td className="px-4 py-4">
-//                                                 <div className="flex items-center justify-end gap-1">
-//                                                     <Link
-//                                                         href={`/dashboard/admin/orders/${order?._id}`}
-//                                                         className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-[color:var(--brand)] transition-all"
-//                                                         style={{ ["--brand" as any]: BRAND }}
-//                                                     >
-//                                                         <FiEye size={16} />
-//                                                     </Link>
-//                                                     <Link
-//                                                         href={`/dashboard/admin/orders/${order?._id}/edit`}
-//                                                         className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-blue-500 transition-all"
-//                                                     >
-//                                                         <FiEdit2 size={16} />
-//                                                     </Link>
-//                                                     <button className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-red-500 transition-all">
-//                                                         <FiTrash2 size={16} />
-//                                                     </button>
-//                                                 </div>
-//                                             </td>
-//                                         </tr>
-//                                     );
-//                                 })
-//                             )}
-//                         </tbody>
-//                     </table>
-//                 </div>
-
-//                 {/* Pagination */}
-//                 <div className="px-5 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/30">
-//                     <div className="flex items-center gap-2 text-sm text-gray-500">
-//                         <span>Show</span>
-//                         <select
-//                             value={limit}
-//                             onChange={(e) => {
-//                                 setLimit(Number(e.target.value));
-//                                 setPage(1);
-//                             }}
-//                             className="border border-gray-200 rounded-md px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#5CAF90]"
-//                         >
-//                             {[10, 25, 50, 100].map((n) => (
-//                                 <option key={n} value={n}>
-//                                     {n}
-//                                 </option>
-//                             ))}
-//                         </select>
-//                         <span>Per Page</span>
-//                     </div>
-
-//                     {totalPages > 1 && (
-//                         <div className="flex items-center gap-2">
-//                             <button
-//                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-//                                 disabled={currentPage === 1}
-//                                 className="p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-//                             >
-//                                 <FiChevronLeft size={18} />
-//                             </button>
-//                             <div className="flex items-center gap-1">
-//                                 {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((p) => (
-//                                     <button
-//                                         key={p}
-//                                         onClick={() => setPage(p)}
-//                                         className="w-8 h-8 rounded-md text-sm font-medium transition-all"
-//                                         style={
-//                                             currentPage === p
-//                                                 ? { backgroundColor: BRAND, color: "white", boxShadow: "0 2px 6px rgba(0,0,0,0.15)" }
-//                                                 : { color: "#4B5563" }
-//                                         }
-//                                     >
-//                                         {p}
-//                                     </button>
-//                                 ))}
-//                             </div>
-//                             <button
-//                                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-//                                 disabled={currentPage === totalPages}
-//                                 className="p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-//                             >
-//                                 <FiChevronRight size={18} />
-//                             </button>
-//                         </div>
-//                     )}
-
-//                     <p className="text-sm text-gray-500 font-medium">
-//                         Showing {orders.length} of {totalOrders} orders
-//                     </p>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
-
-
 
 
 "use client";
@@ -1503,244 +421,244 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rider</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Delivery Slot</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">SMS</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Status</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment</th>
-                                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {isLoading ? (
-                                [...Array(5)].map((_, i) => (
-                                    <tr key={i} className="animate-pulse">
-                                        {Array.from({ length: 11 }).map((__, j) => (
-                                            <td key={j} className="px-4 py-4">
-                                                <div className="h-4 bg-gray-100 rounded w-16" />
-                                            </td>
+          {/* Table */}
+<div className="overflow-x-auto">
+    <table className="w-full text-left min-w-[1400px]">
+        <thead className="bg-gray-50 border-b border-gray-100">
+            <tr>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap w-12">#</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[140px]">Order ID</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[180px]">Customer</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[160px]">Product</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[110px]">Amount</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[160px]">Rider</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[130px]">Delivery Slot</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap w-16">SMS</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[150px]">Order Status</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[140px]">Payment</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap min-w-[110px]">Action</th>
+            </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+            {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                        {Array.from({ length: 11 }).map((__, j) => (
+                            <td key={j} className="px-4 py-4">
+                                <div className="h-4 bg-gray-100 rounded w-16" />
+                            </td>
+                        ))}
+                    </tr>
+                ))
+            ) : orders.length === 0 ? (
+                <tr>
+                    <td colSpan={11} className="px-6 py-12 text-center">
+                        <FiPackage size={48} className="mx-auto text-gray-200 mb-4" />
+                        <p className="text-gray-500">No orders found</p>
+                    </td>
+                </tr>
+            ) : (
+                orders.map((order: any, idx: number) => {
+                    const ago = daysAgo(order?.createdAt);
+                    const slotDate: string | null = order?.deliveryDate || order?.estimatedDelivery || null;
+                    const slotTime: string | null = order?.deliveryTime || order?.preferredDeliveryTime || null;
+                    const hasDeliverySlot = Boolean(slotDate || slotTime);
+                    return (
+                        <tr key={order?._id} className="hover:bg-gray-50/50 transition-colors align-top">
+                            <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                {(currentPage - 1) * limit + idx + 1}
+                            </td>
+
+                            <td className="px-4 py-4 whitespace-nowrap">
+                                <p className="font-semibold" style={{ color: BRAND }}>
+                                    {order?.orderNumber || "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500">{formatDateTime(order?.createdAt)}</p>
+                                {ago && <p className="text-[10px] text-orange-500 font-medium">{ago}</p>}
+                                <p className="text-[10px] text-gray-400 font-medium uppercase">
+                                    {order?.deliveryType || "N/A"}
+                                </p>
+                                <button
+                                    onClick={() => handleCopy(order?.orderNumber)}
+                                    className="mt-1 text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                                >
+                                    <FiCopy size={11} /> Copy
+                                </button>
+                            </td>
+
+                            <td className="px-4 py-4">
+                                <p className="font-medium text-gray-800 whitespace-nowrap">
+                                    {order?.userID?.name || order?.deliveryAddress?.name || "Unknown"}
+                                </p>
+                                <p className="text-xs text-gray-400 flex items-center gap-1.5 mt-0.5">
+                                    {order?.deliveryAddress?.phone || order?.userID?.phone || "No phone"}
+                                    {order?.deliveryAddress?.phone && (
+                                        <>
+                                            <FiCopy
+                                                size={11}
+                                                className="cursor-pointer hover:text-gray-600"
+                                                onClick={() => handleCopy(order.deliveryAddress.phone)}
+                                            />
+                                            <FaWhatsapp size={12} className="text-green-500" />
+                                        </>
+                                    )}
+                                </p>
+                                <p className="text-[11px] text-gray-400 mt-1 max-w-[180px]">
+                                    {[
+                                        order?.deliveryAddress?.houseNo,
+                                        order?.deliveryAddress?.road,
+                                        order?.deliveryAddress?.upazila,
+                                        order?.deliveryAddress?.city,
+                                    ]
+                                        .filter(Boolean)
+                                        .join(", ") || "No address"}
+                                </p>
+                            </td>
+
+                            <td className="px-4 py-4 text-sm text-gray-600">
+                                {Array.isArray(order?.items) && order.items.length > 0 ? (
+                                    <ul className="space-y-0.5">
+                                        {order.items.slice(0, 3).map((it: any, i: number) => (
+                                            <li key={i} className="whitespace-nowrap">
+                                                {i + 1}. {it.productName}{" "}
+                                                <span className="text-gray-400">x{it.quantity}</span>
+                                            </li>
                                         ))}
-                                    </tr>
-                                ))
-                            ) : orders.length === 0 ? (
-                                <tr>
-                                    <td colSpan={11} className="px-6 py-12 text-center">
-                                        <FiPackage size={48} className="mx-auto text-gray-200 mb-4" />
-                                        <p className="text-gray-500">No orders found</p>
-                                    </td>
-                                </tr>
-                            ) : (
-                                orders.map((order: any, idx: number) => {
-                                    const ago = daysAgo(order?.createdAt);
-                                    // deliveryDate/deliveryTime default to null in the schema until the customer
-                                    // actually picks a next-day + time slot at checkout — only show them when set.
-                                    const slotDate: string | null = order?.deliveryDate || order?.estimatedDelivery || null;
-                                    const slotTime: string | null = order?.deliveryTime || order?.preferredDeliveryTime || null;
-                                    const hasDeliverySlot = Boolean(slotDate || slotTime);
-                                    return (
-                                        <tr key={order?._id} className="hover:bg-gray-50/50 transition-colors align-top">
-                                            <td className="px-4 py-4 text-sm text-gray-500">
-                                                {(currentPage - 1) * limit + idx + 1}
-                                            </td>
+                                        {order.items.length > 3 && (
+                                            <li className="text-gray-400">+{order.items.length - 3} more</li>
+                                        )}
+                                    </ul>
+                                ) : (
+                                    "N/A"
+                                )}
+                            </td>
 
-                                            <td className="px-4 py-4">
-                                                <p className="font-semibold" style={{ color: BRAND }}>
-                                                    {order?.orderNumber || "N/A"}
-                                                </p>
-                                                <p className="text-xs text-gray-500">{formatDateTime(order?.createdAt)}</p>
-                                                {ago && <p className="text-[10px] text-orange-500 font-medium">{ago}</p>}
-                                                <p className="text-[10px] text-gray-400 font-medium uppercase">
-                                                    {order?.deliveryType || "N/A"}
-                                                </p>
-                                                <button
-                                                    onClick={() => handleCopy(order?.orderNumber)}
-                                                    className="mt-1 text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-1"
-                                                >
-                                                    <FiCopy size={11} /> Copy
-                                                </button>
-                                            </td>
+                            <td className="px-4 py-4 text-xs text-gray-500 whitespace-nowrap">
+                                <p>Ship: ৳{(order?.shippingCharge ?? 0).toFixed(2)}</p>
+                                <p>Disc: ৳{(order?.discountAmount ?? 0).toFixed(2)}</p>
+                                <p className="font-bold text-gray-800 text-sm mt-0.5">
+                                    Tot: ৳{(order?.totalAmount ?? 0).toFixed(2)}
+                                </p>
+                            </td>
 
-                                            <td className="px-4 py-4">
-                                                <p className="font-medium text-gray-800">
-                                                    {order?.userID?.name || order?.deliveryAddress?.name || "Unknown"}
-                                                </p>
-                                                <p className="text-xs text-gray-400 flex items-center gap-1.5 mt-0.5">
-                                                    {order?.deliveryAddress?.phone || order?.userID?.phone || "No phone"}
-                                                    {order?.deliveryAddress?.phone && (
-                                                        <>
-                                                            <FiCopy
-                                                                size={11}
-                                                                className="cursor-pointer hover:text-gray-600"
-                                                                onClick={() => handleCopy(order.deliveryAddress.phone)}
-                                                            />
-                                                            <FaWhatsapp size={12} className="text-green-500" />
-                                                        </>
-                                                    )}
-                                                </p>
-                                                <p className="text-[11px] text-gray-400 mt-1 max-w-[180px]">
-                                                    {[
-                                                        order?.deliveryAddress?.houseNo,
-                                                        order?.deliveryAddress?.road,
-                                                        order?.deliveryAddress?.upazila,
-                                                        order?.deliveryAddress?.city,
-                                                    ]
-                                                        .filter(Boolean)
-                                                        .join(", ") || "No address"}
-                                                </p>
-                                            </td>
+                            <td className="px-4 py-4">
+                                <select
+                                    value={order?.assignedRider?._id || order?.assignedRider || ""}
+                                    onChange={(e) => handleRiderAssign(order?._id, e.target.value)}
+                                    className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] w-36"
+                                >
+                                    <option value="">Unassigned</option>
+                                    {riders.map((r: any) => (
+                                        <option key={r._id} value={r._id}>
+                                            {r.fullName} · {r.status === "online" ? "🟢 Online" : "⚪ Offline"}
+                                        </option>
+                                    ))}
+                                </select>
+                                {order?.assignedRider && (
+                                    <p className="text-[10px] text-gray-600 mt-1 flex items-center gap-1">
+                                        <span
+                                            className={`inline-block w-1.5 h-1.5 rounded-full ${
+                                                order.assignedRider?.status === "online" ? "bg-green-500" : "bg-gray-300"
+                                            }`}
+                                        />
+                                        {order.assignedRider?.fullName || order.assignedRider?.name || "Rider"}
+                                    </p>
+                                )}
+                                <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                    <FiUser size={10} />
+                                    {order?.riderAssignedAt ? formatDateTime(order.riderAssignedAt) : "Not assigned"}
+                                </p>
+                            </td>
 
-                                            <td className="px-4 py-4 text-sm text-gray-600">
-                                                {Array.isArray(order?.items) && order.items.length > 0 ? (
-                                                    <ul className="space-y-0.5">
-                                                        {order.items.slice(0, 3).map((it: any, i: number) => (
-                                                            <li key={i} className="whitespace-nowrap">
-                                                                {i + 1}. {it.productName} <span className="text-gray-400">x{it.quantity}</span>
-                                                            </li>
-                                                        ))}
-                                                        {order.items.length > 3 && (
-                                                            <li className="text-gray-400">+{order.items.length - 3} more</li>
-                                                        )}
-                                                    </ul>
-                                                ) : (
-                                                    "N/A"
-                                                )}
-                                            </td>
+                            <td className="px-4 py-4 text-xs text-gray-600 whitespace-nowrap">
+                                {hasDeliverySlot ? (
+                                    <>
+                                        {slotDate && (
+                                            <p className="flex items-center gap-1 font-medium text-gray-700">
+                                                <FiCalendar size={11} /> {formatDateOnly(slotDate)}
+                                            </p>
+                                        )}
+                                        {slotTime && (
+                                            <p className="capitalize text-gray-500 flex items-center gap-1">
+                                                <FiClock size={11} /> {slotTime}
+                                            </p>
+                                        )}
+                                    </>
+                                ) : (
+                                    <span className="text-gray-400">Not scheduled</span>
+                                )}
+                            </td>
 
-                                            <td className="px-4 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                                <p>Ship: ৳{(order?.shippingCharge ?? 0).toFixed(2)}</p>
-                                                <p>Disc: ৳{(order?.discountAmount ?? 0).toFixed(2)}</p>
-                                                <p className="font-bold text-gray-800 text-sm mt-0.5">
-                                                    Tot: ৳{(order?.totalAmount ?? 0).toFixed(2)}
-                                                </p>
-                                            </td>
+                            <td className="px-4 py-4">
+                                <button className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                                    <FiMessageSquare size={16} />
+                                </button>
+                            </td>
 
-                                            <td className="px-4 py-4">
-                                                <select
-                                                    value={order?.assignedRider?._id || order?.assignedRider || ""}
-                                                    onChange={(e) => handleRiderAssign(order?._id, e.target.value)}
-                                                    className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] w-36"
-                                                >
-                                                    <option value="">Unassigned</option>
-                                                    {riders.map((r: any) => (
-                                                        <option key={r._id} value={r._id}>
-                                                            {r.fullName} · {r.status === "online" ? "🟢 Online" : "⚪ Offline"}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                {order?.assignedRider && (
-                                                    <p className="text-[10px] text-gray-600 mt-1 flex items-center gap-1">
-                                                        <span
-                                                            className={`inline-block w-1.5 h-1.5 rounded-full ${
-                                                                order.assignedRider?.status === "online" ? "bg-green-500" : "bg-gray-300"
-                                                            }`}
-                                                        />
-                                                        {order.assignedRider?.fullName || order.assignedRider?.name || "Rider"}
-                                                    </p>
-                                                )}
-                                                <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
-                                                    <FiUser size={10} />
-                                                    {order?.riderAssignedAt ? formatDateTime(order.riderAssignedAt) : "Not assigned"}
-                                                </p>
-                                            </td>
+                            <td className="px-4 py-4">
+                                <select
+                                    value={order?.status || "pending"}
+                                    onChange={(e) => handleStatusUpdate(order?._id, e.target.value)}
+                                    className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] capitalize w-full min-w-[120px]"
+                                >
+                                    {ORDER_STATUSES.map((s) => (
+                                        <option key={s} value={s} className="capitalize">
+                                            {s.replace(/_/g, " ")}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="mt-1.5">
+                                    <StatusBadge status={order?.status} />
+                                </div>
+                            </td>
 
-                                            <td className="px-4 py-4 text-xs text-gray-600 whitespace-nowrap">
-                                                {hasDeliverySlot ? (
-                                                    <>
-                                                        {slotDate && (
-                                                            <p className="flex items-center gap-1 font-medium text-gray-700">
-                                                                <FiCalendar size={11} /> {formatDateOnly(slotDate)}
-                                                            </p>
-                                                        )}
-                                                        {slotTime && (
-                                                            <p className="capitalize text-gray-500 flex items-center gap-1">
-                                                                <FiClock size={11} /> {slotTime}
-                                                            </p>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <span className="text-gray-400">Not scheduled</span>
-                                                )}
-                                            </td>
+                            <td className="px-4 py-4">
+                                <p className="text-xs font-semibold uppercase text-gray-600 whitespace-nowrap">
+                                    {order?.paymentMethod || "N/A"}
+                                </p>
+                                <select
+                                    value={order?.paymentStatus || "unpaid"}
+                                    onChange={(e) => handlePaymentUpdate(order?._id, e.target.value)}
+                                    className="text-xs border border-gray-200 rounded-md px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] capitalize w-full min-w-[110px]"
+                                >
+                                    {PAYMENT_STATUSES.map((s) => (
+                                        <option key={s} value={s} className="capitalize">
+                                            {s.replace(/_/g, " ")}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="mt-1">
+                                    <PaymentBadge status={order?.paymentStatus} />
+                                </div>
+                            </td>
 
-                                            <td className="px-4 py-4">
-                                                <button className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
-                                                    <FiMessageSquare size={16} />
-                                                </button>
-                                            </td>
-
-                                            <td className="px-4 py-4">
-                                                <select
-                                                    value={order?.status || "pending"}
-                                                    onChange={(e) => handleStatusUpdate(order?._id, e.target.value)}
-                                                    className="text-xs border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] capitalize"
-                                                >
-                                                    {ORDER_STATUSES.map((s) => (
-                                                        <option key={s} value={s} className="capitalize">
-                                                            {s.replace(/_/g, " ")}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <div className="mt-1.5">
-                                                    <StatusBadge status={order?.status} />
-                                                </div>
-                                            </td>
-
-                                            <td className="px-4 py-4">
-                                                <p className="text-xs font-semibold uppercase text-gray-600">
-                                                    {order?.paymentMethod || "N/A"}
-                                                </p>
-                                                <select
-                                                    value={order?.paymentStatus || "unpaid"}
-                                                    onChange={(e) => handlePaymentUpdate(order?._id, e.target.value)}
-                                                    className="text-xs border border-gray-200 rounded-md px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-[#5CAF90] capitalize"
-                                                >
-                                                    {PAYMENT_STATUSES.map((s) => (
-                                                        <option key={s} value={s} className="capitalize">
-                                                            {s.replace(/_/g, " ")}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <div className="mt-1">
-                                                    <PaymentBadge status={order?.paymentStatus} />
-                                                </div>
-                                            </td>
-
-                                            <td className="px-4 py-4">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Link
-                                                        href={`/dashboard/admin/orders/${order?._id}`}
-                                                        className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-[color:var(--brand)] transition-all"
-                                                        style={{ ["--brand" as any]: BRAND }}
-                                                    >
-                                                        <FiEye size={16} />
-                                                    </Link>
-                                                    <Link
-                                                        href={`/dashboard/admin/orders/${order?._id}/edit`}
-                                                        className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-blue-500 transition-all"
-                                                    >
-                                                        <FiEdit2 size={16} />
-                                                    </Link>
-                                                    <button className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-red-500 transition-all">
-                                                        <FiTrash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            <td className="px-4 py-4">
+                                <div className="flex items-center justify-end gap-1">
+                                    <Link
+                                        href={`/dashboard/admin/orders/${order?._id}`}
+                                        className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-[color:var(--brand)] transition-all"
+                                        style={{ ["--brand" as any]: BRAND }}
+                                    >
+                                        <FiEye size={16} />
+                                    </Link>
+                                    <Link
+                                        href={`/dashboard/admin/orders/${order?._id}/edit`}
+                                        className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-blue-500 transition-all"
+                                    >
+                                        <FiEdit2 size={16} />
+                                    </Link>
+                                    <button className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-red-500 transition-all">
+                                        <FiTrash2 size={16} />
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    );
+                })
+            )}
+        </tbody>
+    </table>
+</div>
 
                 {/* Pagination */}
                 <div className="px-5 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/30">
