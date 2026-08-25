@@ -29,7 +29,6 @@ const riderApi = baseApi.injectEndpoints({
       providesTags: ["RiderApplication"],
     }),
 
- 
     approveApplication: builder.mutation({
       query: (args: { id: string; assignedAreas: string[] }) => ({
         url: `/rider/admin/${args.id}/approve`,
@@ -47,6 +46,19 @@ const riderApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["RiderApplication"],
     }),
+
+    // endpoints: (builder) => ({ ... existing ones ... })
+
+    assignRider: builder.mutation({
+      query: ({ id, riderID }: { id: string; riderID: string | null }) => ({
+        url: `/order/admin/${id}/assign-rider`,
+        method: "PATCH",
+        body: { riderID },
+      }),
+      invalidatesTags: ["Order"],
+    }),
+
+    
 
     // ==================== RIDER MANAGEMENT ====================
     getMyProfile: builder.query({
@@ -77,6 +89,7 @@ const riderApi = baseApi.injectEndpoints({
 
     getAllRiders: builder.query({
       query: (args: any = {}) => ({
+        // url: "/rider/admin/rider/all",
         url: "/rider/admin/rider/all",
         method: "GET",
         params: args,
@@ -120,6 +133,7 @@ export const {
   useGetAllApplicationsQuery,
   useApproveApplicationMutation,
   useRejectApplicationMutation,
+    useAssignRiderMutation,
 
   useGetMyProfileQuery,
   useUpdateRiderStatusMutation,
