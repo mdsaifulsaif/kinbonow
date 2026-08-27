@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -30,6 +29,10 @@ import {
   FiGlobe,
   FiActivity,
   FiMapPin,
+  FiLayers,
+  FiAward,
+  FiBox,
+  FiAlertCircle,
 } from "react-icons/fi";
 import { useSocket } from "@/lib/socket";
 
@@ -52,7 +55,7 @@ const menuItems = [
   {
     name: "Categories",
     href: "/dashboard/admin/categories",
-    icon: FiGrid,
+    icon: FiLayers,
     badge: null as string | null,
     submenu: [
       { name: "All Categories", href: "/dashboard/admin/categories" },
@@ -62,7 +65,7 @@ const menuItems = [
   {
     name: "Brands",
     href: "/dashboard/admin/brands",
-    icon: FiGrid,
+    icon: FiAward,
     badge: null as string | null,
     submenu: [
       { name: "All Brands", href: "/dashboard/admin/brands" },
@@ -72,7 +75,7 @@ const menuItems = [
   {
     name: "Units",
     href: "/dashboard/admin/units",
-    icon: FiGrid,
+    icon: FiBox,
     badge: null as string | null,
     submenu: [
       { name: "All Unit", href: "/dashboard/admin/units" },
@@ -82,18 +85,18 @@ const menuItems = [
   {
     name: "Areas",
     href: "/dashboard/admin/area",
-    icon: FiGrid,
+    icon: FiMapPin,
     badge: null as string | null,
     submenu: [
       { name: "All Areas", href: "/dashboard/admin/areas" },
       { name: "Create Area", href: "/dashboard/admin/areas/new" },
     ],
   },
-  { name: "Complaints", href: "/dashboard/admin/complaints", icon: FiGrid, badge: null as string | null },
+  { name: "Complaints", href: "/dashboard/admin/complaints", icon: FiAlertCircle, badge: null as string | null },
   {
     name: "Riders",
     href: "/dashboard/admin/riders",
-    icon: FiGrid,
+    icon: FiTruck,
     badge: null as string | null,
     submenu: [
       { name: "All Riders", href: "/dashboard/admin/riders" },
@@ -103,7 +106,7 @@ const menuItems = [
   { name: "Orders", href: "/dashboard/admin/orders", icon: FiShoppingCart, badge: null as string | null, badgeColor: "bg-red-500" },
   { name: "Customers", href: "/dashboard/admin/customers", icon: FiUsers, badge: null as string | null },
   { name: "Payments", href: "/dashboard/admin/payments", icon: FiCreditCard, badge: null as string | null },
-  { name: "Shipping", href: "/dashboard/admin/shipping", icon: FiTruck, badge: null as string | null },
+  { name: "Shipping", href: "/dashboard/admin/shipping", icon: FiPackage, badge: null as string | null },
   { name: "Reviews", href: "/dashboard/admin/reviews", icon: FiStar, badge: "5", badgeColor: "bg-yellow-500" },
   { name: "Coupons", href: "/dashboard/admin/coupons", icon: FiTag, badge: null as string | null },
   { name: "Analytics", href: "/dashboard/admin/analytics", icon: FiBarChart2, badge: null as string | null },
