@@ -37,6 +37,7 @@ import {
 import { toast } from "react-hot-toast";
 import OrderEditModal from "./_components/OrderEditModal";
 import OrderDetailsModal from "./_components/OrderDetailsModal";
+import CreateOrderModal from "./_components/CreateOrderModal";
 
 const BRAND = "#5CAF90";
 const BRAND_DARK = "#4A9A7D";
@@ -210,6 +211,9 @@ export default function OrdersPage() {
 
   const [detailsOrderId, setDetailsOrderId] = useState<string | null>(null);
   const [editOrderId, setEditOrderId] = useState<string | null>(null);
+
+  // custom order state
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
@@ -433,6 +437,7 @@ export default function OrdersPage() {
             </button>
 
             <button
+              onClick={() => setShowCreateModal(true)}
               className="px-4 py-2.5 text-white rounded-md text-sm font-semibold hover:opacity-90 transition-all shadow-md flex items-center gap-2"
               style={{ backgroundColor: BRAND }}
             >
@@ -921,6 +926,15 @@ export default function OrdersPage() {
           onClose={() => {
             setEditOrderId(null);
             refetch(); // ✅ edit শেষে table এর ডেটা রিফ্রেশ
+          }}
+        />
+      )}
+
+      {showCreateModal && (
+        <CreateOrderModal
+          onClose={() => {
+            setShowCreateModal(false);
+            refetch();
           }}
         />
       )}

@@ -246,6 +246,14 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Orders"],
     }),
+    createOrderAdmin: builder.mutation({
+      query: (payload: any) => ({
+        url: "/order/admin/create",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Orders"],
+    }),
   }),
 });
 
@@ -257,6 +265,7 @@ export const {
   useUpdateOrderStatusMutation,
   useUpdatePaymentStatusMutation,
   useAddAdminNoteMutation,
+  useCreateOrderAdminMutation,
 
   // User hooks
   useCreateOrderMutation,
