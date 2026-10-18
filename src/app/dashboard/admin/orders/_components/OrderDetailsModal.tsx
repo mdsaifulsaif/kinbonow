@@ -15,6 +15,7 @@ import {
   FiCreditCard,
   FiInfo,
   FiGift,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import { useGetAdminOrderByIdQuery } from "@/redux/api/orderApi";
 
@@ -101,6 +102,40 @@ export default function OrderDetailsModal({ orderId, onClose }: Props) {
             <p className="text-center text-gray-400 py-10">Order not found</p>
           ) : (
             <>
+              {/* Outside Location Warning - Super Admin Verification */}
+              {order?.isOutsideLocation && (
+                <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <FiAlertTriangle size={18} />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-amber-200 text-amber-900 rounded font-bold text-xs uppercase tracking-wide">
+                        Outside Barisal Coverage
+                      </span>
+                      <span className="text-xs text-amber-800 font-semibold">
+                        Call Confirmation Required
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      This order was placed from outside the local Barisal area. Please call the recipient or customer at{" "}
+                      <a
+                        href={`tel:${order?.deliveryAddress?.phone}`}
+                        className="font-bold underline text-amber-900 hover:text-black"
+                      >
+                        {order?.deliveryAddress?.phone || "Phone"}
+                      </a>{" "}
+                      to confirm delivery details before dispatching a rider.
+                    </p>
+                    {order?.orderPlacedCoords && (
+                      <p className="text-[11px] font-mono text-amber-700">
+                        Device GPS Coordinates: {order.orderPlacedCoords.lat?.toFixed(4)}, {order.orderPlacedCoords.lng?.toFixed(4)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Customer Info */}
               <section>
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">

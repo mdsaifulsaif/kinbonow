@@ -52,7 +52,7 @@ export interface ThemeConfig {
 
 const defaultTheme: ThemeConfig = {
   // Colors
-  primaryColor: '#5CAF90',
+  primaryColor: '#619d23',
   secondaryColor: '#4B5966',
   accentColor: '#FF6B6B',
   backgroundColor: '#FFFFFF',

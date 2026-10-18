@@ -627,6 +627,11 @@ export default function OrdersPage() {
                             </>
                           )}
                         </p>
+                        {order?.isOutsideLocation && (
+                          <div className="mt-1 flex items-center gap-1 w-max px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                            <span>🚩 Outside Area (Call)</span>
+                          </div>
+                        )}
                         <p className="text-[11px] text-gray-400 mt-1 max-w-[180px]">
                           {[
                             order?.deliveryAddress?.houseNo,
