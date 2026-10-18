@@ -401,10 +401,17 @@ export const authOptions: NextAuthOptions = {
       }
 
       // =================================================
+      // ✅ IF ALREADY IN ERROR STATE, DON'T SPAM REFRESH
+      // =================================================
+      if (token.error) {
+        return token;
+      }
+
+      // =================================================
       // ✅ SAFETY CHECK
       // =================================================
-      // accessTokenExpires না থাকলে Date comparison
-      // করে সমস্যা হওয়া থেকে prevent করবে।
+      // accessTokenExpires na thakle Date comparison
+      // kore shomossha howa theke prevent korbe.
       // =================================================
       if (!token.accessTokenExpires) {
         console.warn(

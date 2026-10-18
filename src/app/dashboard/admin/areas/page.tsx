@@ -129,6 +129,7 @@ const AreasPage = () => {
                                     <tr className="bg-gray-50/50 border-b border-gray-100">
                                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">#</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Area Name</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">GPS Coordinates</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">City</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Riders</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
@@ -153,6 +154,22 @@ const AreasPage = () => {
                                                         )}
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {area.latitude && area.longitude ? (
+                                                    <div className="flex flex-col">
+                                                        <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-0.5 rounded w-max">
+                                                            {area.latitude}, {area.longitude}
+                                                        </span>
+                                                        <span className="text-[11px] text-gray-400 mt-0.5">
+                                                            ~{area.radius || 1500}m radius
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
+                                                        Auto-mapped
+                                                    </span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{area.city || "Barisal"}</td>
                                             <td className="px-6 py-4">
