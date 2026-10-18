@@ -41,23 +41,32 @@ export default function LoginPage() {
   //   }
   // };
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // ✅ এখানে redirect: true এবং callbackUrl ব্যবহার করুন
       const res = await signIn("credentials", {
         email,
         password,
-        redirect: true,
-        callbackUrl: "/dashboard/admin", // লগইন সফল হলে সরাসরি এখানে চলে যাবে
+        redirect: false,
       });
 
-      // যেহেতু redirect: true দেওয়া আছে, তাই নিচের কোডগুলো সাধারণত রান হওয়ার সুযোগ পায় না (সরাসরি রিডাইরেক্ট হয়ে যায়)
-    } catch (err) {
+      if (res?.error) {
+        const errorMsg =
+          res.error === "CredentialsSignin"
+            ? "Invalid email or password."
+            : res.error;
+        toast.error(errorMsg);
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Login Successful! Welcome back.");
+      window.location.href = "/dashboard/admin";
+    } catch (err: any) {
       console.error("Login error:", err);
-      toast.error("কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন");
+      toast.error(err?.message || "Something went wrong, please try again.");
       setLoading(false);
     }
   };

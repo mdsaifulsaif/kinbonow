@@ -1,96 +1,85 @@
+import {
+  createApi,
+  fetchBaseQuery,
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from "@reduxjs/toolkit/query/react";
+import { getSession, signOut } from "next-auth/react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1";
 
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { getSession } from 'next-auth/react';
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: API_URL,
+  credentials: "include",
+  prepareHeaders: async (headers) => {
+    try {
+      const session = await getSession();
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+      if (session?.accessToken) {
+        headers.set("authorization", `Bearer ${session.accessToken}`);
+      }
+    } catch (error) {
+      console.error("Session fetch error in RTK Query:", error);
+    }
 
-export const baseApi = createApi({
-    reducerPath: 'api',
-    baseQuery: fetchBaseQuery({
-        baseUrl: API_URL,
-        credentials: 'include',
-        prepareHeaders: async (headers) => {
-            try {
-                const session = await getSession();
-
-                if (session?.accessToken) {
-                    headers.set('authorization', `Bearer ${session.accessToken}`);
-                }
-            } catch (error) {
-                console.error("Session fetch error in RTK Query:", error);
-            }
-
-            // ❌ Content-Type জোর করে বসানো বাদ দেওয়া হলো
-            // fetchBaseQuery নিজে থেকেই JSON body হলে application/json বসায়,
-            // আর FormData হলে browser নিজে multipart boundary বসায়।
-            // ম্যানুয়ালি সেট করলে avatar upload ভেঙে যায়।
-
-            return headers;
-        },
-    }),
-    tagTypes: [
-        'Stats', 'Orders', 'Products', 'Users', 'Analytics', 'PageContent',
-        'SiteContent', 'Categories', 'Payments', 'Shipping', 'Coupons',
-        'Reviews', 'Brands', 'Complaints', 'Area', 'Rider',
-        'RiderApplication', 'User', 'StoreSetting', 'Riders', 'RiderProfile','Brand','Area','Dashboard','Payout'
-    ],
-    endpoints: () => ({}),
+    return headers;
+  },
 });
 
+const baseQueryWithReauth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  let result = await rawBaseQuery(args, api, extraOptions);
 
+  if (result.error && result.error.status === 401) {
+    console.warn("🔒 [baseApi] 401 Unauthorized received. Checking session...");
+    const session = await getSession();
 
+    if (session?.accessToken && !(session as any).error) {
+      // Retry with refreshed access token
+      result = await rawBaseQuery(args, api, extraOptions);
+    } else {
+      if (typeof window !== "undefined") {
+        console.error("🔴 [baseApi] Token expired or invalid. Redirecting to login...");
+        signOut({ callbackUrl: "/login" });
+      }
+    }
+  }
 
+  return result;
+};
 
-
-// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-// import { RootState } from '../store';
-
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
-
-// export const baseApi = createApi({
-//     reducerPath: 'api',
-//     baseQuery: fetchBaseQuery({
-//         baseUrl: API_URL,
-//         credentials: 'include', // cookies এর জন্য (যদি পরে দরকার হয়)
-//         prepareHeaders: (headers, { getState }) => {
-//             // Redux থেকে টোকেন নেওয়ার চেষ্টা করো
-//             const token = (getState() as RootState).auth?.token || 
-//                          localStorage.getItem('token');
-
-//             // যদি টোকেন থাকে তাহলে Authorization Header সেট করো
-//             if (token) {
-//                 headers.set('authorization', `Bearer ${token}`);
-//             }
-
-//             // Content-Type সেট করো (FormData এর জন্য এটা অটো হ্যান্ডেল হয়)
-//             if (!headers.has('Content-Type')) {
-//                 headers.set('Content-Type', 'application/json');
-//             }
-
-//             return headers;
-//         },
-//     }),
-//     tagTypes: [
-//         'Stats', 
-//         'Orders', 
-//         'Products', 
-//         'Users', 
-//         'Analytics', 
-//         'PageContent', 
-//         'SiteContent', 
-//         'Categories', 
-//         'Payments', 
-//         'Shipping', 
-//         'Coupons', 
-//         'Reviews', 
-//         'Brands', 
-//         'Complaints',
-//         'Area',
-//         'Rider', 
-//         'RiderApplication',
-//         'User'  ,
-//         'StoreSetting'         // ← এটা যোগ করা হয়েছে (Register/Login এর জন্য)
-//     ],
-//     endpoints: () => ({}),
-// });
+export const baseApi = createApi({
+  reducerPath: "api",
+  baseQuery: baseQueryWithReauth,
+  tagTypes: [
+    "Stats",
+    "Orders",
+    "Products",
+    "Users",
+    "Analytics",
+    "PageContent",
+    "SiteContent",
+    "Categories",
+    "Payments",
+    "Shipping",
+    "Coupons",
+    "Reviews",
+    "Brands",
+    "Complaints",
+    "Area",
+    "Rider",
+    "RiderApplication",
+    "User",
+    "StoreSetting",
+    "Riders",
+    "RiderProfile",
+    "Brand",
+    "Dashboard",
+    "Payout",
+  ],
+  endpoints: () => ({}),
+});

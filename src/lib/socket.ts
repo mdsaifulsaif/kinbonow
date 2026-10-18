@@ -115,6 +115,13 @@ export const useSocket = () => {
       return;
     }
 
+    // ✅ Vercel বা অন্য পরিবেশে socket disable করা থাকলে connect করবে না
+    if (process.env.NEXT_PUBLIC_USE_SOCKET === "false") {
+      console.log("ℹ️ [Admin] Socket is disabled (NEXT_PUBLIC_USE_SOCKET === 'false')");
+      setIsLoading(false);
+      return;
+    }
+
     const adminID = session.user.id;
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
     console.log("🔌 [Admin] Connecting to socket server:", socketUrl);
