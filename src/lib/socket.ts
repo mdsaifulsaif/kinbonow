@@ -123,16 +123,20 @@ export const useSocket = () => {
     }
 
     const adminID = session.user.id;
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+    const socketUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL ||
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/v1\/?$/, "") ||
+      "http://localhost:5001";
     console.log("🔌 [Admin] Connecting to socket server:", socketUrl);
 
     const socket = io(socketUrl, {
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
       withCredentials: true,
       reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
+      timeout: 10000,
     });
 
     socketRef.current = socket;
@@ -147,13 +151,13 @@ export const useSocket = () => {
     socket.on("disconnect", (reason) => {
       console.log("❌ [Admin] Socket disconnected:", reason);
       setIsConnected(false);
-      if (reason === "io server disconnect" || reason === "transport close") {
+      if (reason === "io server disconnect") {
         socket.connect();
       }
     });
 
     socket.on("connect_error", (error) => {
-      console.error("🔴 [Admin] Socket connect_error:", error);
+      console.warn("⚠️ [Admin] Socket connect notice:", error?.message || error);
     });
 
     socket.on("admin-join-ack", (data: any) => {
