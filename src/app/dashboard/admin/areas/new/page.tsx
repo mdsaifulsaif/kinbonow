@@ -74,8 +74,13 @@ const AreaFormInner = () => {
         longitude: lngVal,
         radius: area.radius ?? 1500,
       });
+    } else if (!isEditing) {
+      const prefillName = searchParams.get("name");
+      if (prefillName) {
+        setFormData((prev) => ({ ...prev, name: prefillName }));
+      }
     }
-  }, [isEditing, areaToEdit]);
+  }, [isEditing, areaToEdit, searchParams]);
 
   const handleChange = (
     e: React.ChangeEvent<

@@ -57,13 +57,22 @@ const AreasPage = () => {
                     <h1 className="text-2xl font-bold text-gray-800">Delivery Areas</h1>
                     <p className="text-sm text-gray-500 mt-1">Manage Barisal city delivery zones</p>
                 </div>
-                <Link
-                    href="/dashboard/admin/areas/new"
-                    className="flex items-center gap-2 px-5 py-2.5 bg-[#5CAF90] text-white rounded-md font-semibold hover:bg-[#4A9A7D] transition-all shadow-md"
-                >
-                    <FiPlus size={20} />
-                    Create New Area
-                </Link>
+                <div className="flex items-center gap-3 flex-wrap">
+                    <Link
+                        href="/dashboard/admin/areas/requests"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-50 hover:text-[#5CAF90] transition-all shadow-sm"
+                    >
+                        <FiMapPin size={18} className="text-[#5CAF90]" />
+                        Customer Area Requests
+                    </Link>
+                    <Link
+                        href="/dashboard/admin/areas/new"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#5CAF90] text-white rounded-md font-semibold hover:bg-[#4A9A7D] transition-all shadow-md"
+                    >
+                        <FiPlus size={20} />
+                        Create New Area
+                    </Link>
+                </div>
             </div>
 
             {/* Search & Filter */}
