@@ -112,6 +112,7 @@ const menuItems = [
   { name: "Shipping", href: "/dashboard/admin/shipping", icon: FiPackage, badge: null as string | null },
   { name: "Reviews", href: "/dashboard/admin/reviews", icon: FiStar, badge: "5", badgeColor: "bg-yellow-500" },
   { name: "Coupons", href: "/dashboard/admin/coupons", icon: FiTag, badge: null as string | null },
+  { name: "Hero Banners", href: "/dashboard/admin/banners", icon: FiImage, badge: null as string | null },
   { name: "Analytics", href: "/dashboard/admin/analytics", icon: FiBarChart2, badge: null as string | null },
   { name: "System Health", href: "/dashboard/admin/health", icon: FiActivity, badge: null as string | null },
   { name: "API Scanner", href: "/dashboard/admin/scanner", icon: FiSearch, badge: null as string | null },
