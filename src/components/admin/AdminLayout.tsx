@@ -34,6 +34,7 @@ import {
   FiBox,
   FiAlertCircle,
   FiMail,
+  FiRepeat,
 } from "react-icons/fi";
 import { useSocket } from "@/lib/socket";
 
@@ -106,6 +107,7 @@ const menuItems = [
     ],
   },
   { name: "Orders", href: "/dashboard/admin/orders", icon: FiShoppingCart, badge: null as string | null, badgeColor: "bg-red-500" },
+  { name: "Subscriptions", href: "/dashboard/admin/subscriptions", icon: FiRepeat, badge: "Auto" as string | null, badgeColor: "bg-emerald-500" },
   { name: "Customers", href: "/dashboard/admin/customers", icon: FiUsers, badge: null as string | null },
   { name: "Subscribers", href: "/dashboard/admin/subscribers", icon: FiMail, badge: null as string | null },
   { name: "Payments", href: "/dashboard/admin/payments", icon: FiCreditCard, badge: null as string | null },
