@@ -35,6 +35,7 @@ import {
   FiAlertCircle,
   FiMail,
   FiRepeat,
+  FiTarget,
 } from "react-icons/fi";
 import { useSocket } from "@/lib/socket";
 
@@ -127,12 +128,14 @@ const menuItems = [
   { name: "Coupons", href: "/dashboard/admin/coupons", icon: FiTag, badge: null as string | null },
   { name: "Hero Banners", href: "/dashboard/admin/banners", icon: FiImage, badge: null as string | null },
   { name: "Analytics", href: "/dashboard/admin/analytics", icon: FiBarChart2, badge: null as string | null },
+  { name: "Marketing & Pixels", href: "/dashboard/admin/marketing", icon: FiTarget, badge: "CAPI", badgeColor: "bg-purple-600" },
   { name: "System Health", href: "/dashboard/admin/health", icon: FiActivity, badge: null as string | null },
   { name: "API Scanner", href: "/dashboard/admin/scanner", icon: FiSearch, badge: null as string | null },
 ];
 
 const settingsItems = [
   { name: "General", href: "/dashboard/admin/settings", icon: FiSettings },
+  { name: "Marketing & Tracking", href: "/dashboard/admin/marketing", icon: FiTarget },
   { name: "Theme", href: "/dashboard/admin/theme", icon: FiDroplet },
   { name: "Site Content", href: "/dashboard/admin/content", icon: FiFileText },
   { name: "Media", href: "/dashboard/admin/media", icon: FiImage },
