@@ -164,6 +164,13 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    searchUsers: builder.query({
+      query: (searchQuery: string) => ({
+        url: `/auth/search?query=${encodeURIComponent(searchQuery)}`,
+        method: "GET",
+      }),
+      keepUnusedDataFor: 5,
+    }),
   }),
 });
 
@@ -179,4 +186,5 @@ export const {
   useRefreshTokenMutation,
   useGetMeQuery,
   useUpdateProfileMutation,
+  useSearchUsersQuery
 } = authApi;

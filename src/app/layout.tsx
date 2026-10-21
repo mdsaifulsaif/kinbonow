@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 
 import { Toaster } from "react-hot-toast";
 import AuthSessionProvider from "@/components/providers/AuthSessionProvider";
+import DynamicAdminTheme from "@/components/theme/DynamicAdminTheme";
 
 export default function RootLayout({
   children,
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body>
         <AuthSessionProvider>
           <ReduxProvider>
+            <DynamicAdminTheme />
             <Toaster position="top-center" reverseOrder={false} />
             {children}
           </ReduxProvider>

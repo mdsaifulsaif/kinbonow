@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -30,6 +29,13 @@ import {
   FiGlobe,
   FiActivity,
   FiMapPin,
+  FiLayers,
+  FiAward,
+  FiBox,
+  FiAlertCircle,
+  FiMail,
+  FiRepeat,
+  FiTarget,
 } from "react-icons/fi";
 import { useSocket } from "@/lib/socket";
 
@@ -52,7 +58,7 @@ const menuItems = [
   {
     name: "Categories",
     href: "/dashboard/admin/categories",
-    icon: FiGrid,
+    icon: FiLayers,
     badge: null as string | null,
     submenu: [
       { name: "All Categories", href: "/dashboard/admin/categories" },
@@ -62,7 +68,7 @@ const menuItems = [
   {
     name: "Brands",
     href: "/dashboard/admin/brands",
-    icon: FiGrid,
+    icon: FiAward,
     badge: null as string | null,
     submenu: [
       { name: "All Brands", href: "/dashboard/admin/brands" },
@@ -72,7 +78,7 @@ const menuItems = [
   {
     name: "Units",
     href: "/dashboard/admin/units",
-    icon: FiGrid,
+    icon: FiBox,
     badge: null as string | null,
     submenu: [
       { name: "All Unit", href: "/dashboard/admin/units" },
@@ -82,18 +88,19 @@ const menuItems = [
   {
     name: "Areas",
     href: "/dashboard/admin/area",
-    icon: FiGrid,
+    icon: FiMapPin,
     badge: null as string | null,
     submenu: [
       { name: "All Areas", href: "/dashboard/admin/areas" },
+      { name: "Area Requests", href: "/dashboard/admin/areas/requests" },
       { name: "Create Area", href: "/dashboard/admin/areas/new" },
     ],
   },
-  { name: "Complaints", href: "/dashboard/admin/complaints", icon: FiGrid, badge: null as string | null },
+  { name: "Complaints", href: "/dashboard/admin/complaints", icon: FiAlertCircle, badge: null as string | null },
   {
     name: "Riders",
     href: "/dashboard/admin/riders",
-    icon: FiGrid,
+    icon: FiTruck,
     badge: null as string | null,
     submenu: [
       { name: "All Riders", href: "/dashboard/admin/riders" },
@@ -101,18 +108,34 @@ const menuItems = [
     ],
   },
   { name: "Orders", href: "/dashboard/admin/orders", icon: FiShoppingCart, badge: null as string | null, badgeColor: "bg-red-500" },
+  {
+    name: "Subscriptions",
+    href: "/dashboard/admin/subscriptions",
+    icon: FiRepeat,
+    badge: "Auto" as string | null,
+    badgeColor: "bg-emerald-500",
+    submenu: [
+      { name: "Customer Subscriptions", href: "/dashboard/admin/subscriptions" },
+      { name: "Subscription Packages", href: "/dashboard/admin/subscriptions/packages" },
+      { name: "Add New Package", href: "/dashboard/admin/subscriptions/packages/new" },
+    ],
+  },
   { name: "Customers", href: "/dashboard/admin/customers", icon: FiUsers, badge: null as string | null },
+  { name: "Subscribers", href: "/dashboard/admin/subscribers", icon: FiMail, badge: null as string | null },
   { name: "Payments", href: "/dashboard/admin/payments", icon: FiCreditCard, badge: null as string | null },
-  { name: "Shipping", href: "/dashboard/admin/shipping", icon: FiTruck, badge: null as string | null },
+  { name: "Shipping", href: "/dashboard/admin/shipping", icon: FiPackage, badge: null as string | null },
   { name: "Reviews", href: "/dashboard/admin/reviews", icon: FiStar, badge: "5", badgeColor: "bg-yellow-500" },
   { name: "Coupons", href: "/dashboard/admin/coupons", icon: FiTag, badge: null as string | null },
+  { name: "Hero Banners", href: "/dashboard/admin/banners", icon: FiImage, badge: null as string | null },
   { name: "Analytics", href: "/dashboard/admin/analytics", icon: FiBarChart2, badge: null as string | null },
+  { name: "Marketing & Pixels", href: "/dashboard/admin/marketing", icon: FiTarget, badge: "CAPI", badgeColor: "bg-purple-600" },
   { name: "System Health", href: "/dashboard/admin/health", icon: FiActivity, badge: null as string | null },
   { name: "API Scanner", href: "/dashboard/admin/scanner", icon: FiSearch, badge: null as string | null },
 ];
 
 const settingsItems = [
   { name: "General", href: "/dashboard/admin/settings", icon: FiSettings },
+  { name: "Marketing & Tracking", href: "/dashboard/admin/marketing", icon: FiTarget },
   { name: "Theme", href: "/dashboard/admin/theme", icon: FiDroplet },
   { name: "Site Content", href: "/dashboard/admin/content", icon: FiFileText },
   { name: "Media", href: "/dashboard/admin/media", icon: FiImage },
@@ -232,7 +255,7 @@ const handleLogout = async () => {
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-700/50">
           {sidebarOpen && (
             <Link href="/dashboard/admin" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center font-bold text-lg shadow-md">
+              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#619d23] to-[#548a1e] flex items-center justify-center font-bold text-lg shadow-md">
                 M
               </div>
               <div>
@@ -276,7 +299,7 @@ const handleLogout = async () => {
                     }
                   }}
                   className={`flex items-center justify-between px-4 py-3 rounded-md transition-all duration-200 ${
-                    active ? "bg-[#5CAF90] text-white shadow-md" : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    active ? "bg-[#619d23] text-white shadow-md shadow-[#619d23]/25" : "text-gray-300 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -312,7 +335,7 @@ const handleLogout = async () => {
                         href={sub.href}
                         className={`block px-4 py-2 rounded-md text-sm transition-colors ${
                           pathname === sub.href
-                            ? "text-[#5CAF90] bg-[#5CAF90]/10"
+                            ? "text-[#619d23] bg-[#619d23]/10"
                             : "text-gray-400 hover:text-white hover:bg-white/5"
                         }`}
                       >
@@ -412,7 +435,7 @@ const handleLogout = async () => {
 
               {showNotifications && (
                 <div className="absolute right-0 mt-2 w-96 max-h-[500px] bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
-                  <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-[#5CAF90]/5 to-[#4A9A7D]/5">
+                  <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-[#619d23]/5 to-[#548a1e]/5">
                     <div>
                       <h3 className="font-semibold text-gray-800">Notifications</h3>
                       <p className="text-xs text-gray-500">
@@ -422,7 +445,7 @@ const handleLogout = async () => {
                     {notifications.length > 0 && (
                       <button
                         onClick={markAllAsRead}
-                        className="text-xs text-[#5CAF90] hover:text-[#4A9A7D] font-medium hover:underline"
+                        className="text-xs text-[#619d23] hover:text-[#548a1e] font-medium hover:underline"
                       >
                         Mark all read
                       </button>
@@ -444,7 +467,7 @@ const handleLogout = async () => {
                           key={notification.id}
                           onClick={() => handleNotificationClick(notification)}
                           className={`w-full text-left p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                            !notification.read ? "bg-[#5CAF90]/5 border-l-4 border-l-[#5CAF90]" : ""
+                            !notification.read ? "bg-[#619d23]/5 border-l-4 border-l-[#619d23]" : ""
                           }`}
                         >
                           <div className="flex items-start gap-3">
@@ -467,12 +490,12 @@ const handleLogout = async () => {
                                   </span>
                                 </p>
                                 {!notification.read && (
-                                  <span className="w-2 h-2 bg-[#5CAF90] rounded-full flex-shrink-0 mt-1.5" />
+                                  <span className="w-2 h-2 bg-[#619d23] rounded-full flex-shrink-0 mt-1.5" />
                                 )}
                               </div>
                               <div className="mt-1 space-y-1">
                                 <p className="text-xs text-gray-600">
-                                  <span className="font-medium text-[#5CAF90]">{notification.totalAmount} TK</span>
+                                  <span className="font-medium text-[#619d23]">{notification.totalAmount} TK</span>
                                   {" • "}
                                   {notification.itemCount} item{notification.itemCount > 1 ? "s" : ""}
                                   {" • "}
@@ -504,7 +527,7 @@ const handleLogout = async () => {
                     <div className="p-3 border-t border-gray-100 bg-gray-50">
                       <Link
                         href="/dashboard/admin/orders"
-                        className="block text-center text-sm text-[#5CAF90] hover:text-[#4A9A7D] font-medium"
+                        className="block text-center text-sm text-[#619d23] hover:text-[#548a1e] font-medium"
                         onClick={() => setShowNotifications(false)}
                       >
                         View all orders →
@@ -517,7 +540,7 @@ const handleLogout = async () => {
 
             {/* Profile */}
             <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 rounded-md px-3 py-2 transition-colors">
-              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#5CAF90] to-[#4A9A7D] flex items-center justify-center text-white font-bold shadow-md">
+              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#619d23] to-[#548a1e] flex items-center justify-center text-white font-bold shadow-md">
                 A
               </div>
               <div className="hidden sm:block">

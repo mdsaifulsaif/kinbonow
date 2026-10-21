@@ -1,392 +1,509 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import {
-    FiTrendingUp,
-    FiTrendingDown,
-    FiDollarSign,
-    FiShoppingCart,
-    FiUsers,
-    FiPackage,
-    FiRefreshCw,
-    FiCalendar,
-    FiArrowUp,
-    FiArrowDown,
-    FiPieChart,
-    FiBarChart2,
-    FiActivity,
-    FiMapPin,
-} from 'react-icons/fi';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
-// Demo data
-const demoData = {
-    overview: {
-        totalRevenue: 1254300,
-        totalOrders: 1245,
-        totalCustomers: 2450,
-        averageOrderValue: 1007,
-        revenueGrowth: 12.5,
-        ordersGrowth: 8.2,
-        customersGrowth: 15.3,
-        aovGrowth: 4.1,
-    },
-    revenueByMonth: [
-        { month: 'Jan', revenue: 85000 },
-        { month: 'Feb', revenue: 92000 },
-        { month: 'Mar', revenue: 88000 },
-        { month: 'Apr', revenue: 105000 },
-        { month: 'May', revenue: 98000 },
-        { month: 'Jun', revenue: 125000 },
-        { month: 'Jul', revenue: 115000 },
-        { month: 'Aug', revenue: 135000 },
-        { month: 'Sep', revenue: 128000 },
-        { month: 'Oct', revenue: 145000 },
-        { month: 'Nov', revenue: 138000 },
-        { month: 'Dec', revenue: 165000 },
-    ],
-    topCategories: [
-        { name: 'Electronics', value: 35, color: '#5CAF90' },
-        { name: 'Clothing', value: 25, color: '#3B82F6' },
-        { name: 'Footwear', value: 18, color: '#F59E0B' },
-        { name: 'Accessories', value: 12, color: '#EC4899' },
-        { name: 'Others', value: 10, color: '#8B5CF6' },
-    ],
-    topProducts: [
-        { name: 'Wireless Headphones', sales: 234, revenue: 583266 },
-        { name: 'Smart Watch Pro', sales: 189, revenue: 944811 },
-        { name: 'Running Shoes', sales: 156, revenue: 545844 },
-        { name: 'Laptop Bag', sales: 134, revenue: 200866 },
-        { name: 'Bluetooth Speaker', sales: 112, revenue: 223888 },
-    ],
-    topCities: [
-        { name: 'Dhaka', orders: 456, percentage: 45 },
-        { name: 'Chattogram', orders: 189, percentage: 18 },
-        { name: 'Rajshahi', orders: 98, percentage: 10 },
-        { name: 'Khulna', orders: 85, percentage: 8 },
-        { name: 'Sylhet', orders: 72, percentage: 7 },
-        { name: 'Others', orders: 125, percentage: 12 },
-    ],
-    recentActivity: [
-        { type: 'order', message: 'New order #ORD-1245 from Rahim Uddin', time: '5 min ago' },
-        { type: 'customer', message: 'New customer Salma Begum registered', time: '12 min ago' },
-        { type: 'payment', message: 'Payment of ৳4,999 received for #ORD-1244', time: '25 min ago' },
-        { type: 'order', message: 'Order #ORD-1243 marked as delivered', time: '1 hour ago' },
-        { type: 'review', message: 'New 5-star review for Wireless Headphones', time: '2 hours ago' },
-    ],
-};
+  FiDollarSign,
+  FiShoppingCart,
+  FiUsers,
+  FiPackage,
+  FiRefreshCw,
+  FiArrowUp,
+  FiArrowDown,
+  FiPieChart,
+  FiBarChart2,
+  FiActivity,
+  FiCheckCircle,
+  FiXCircle,
+  FiClock,
+  FiTruck,
+  FiTarget,
+  FiAlertTriangle,
+} from "react-icons/fi";
+import { useGetDashboardStatsQuery } from "@/redux/api/dashboardApi";
+import { useGetTrackingLogsQuery } from "@/redux/api/marketingApi";
 
 // Stat Card Component
-const StatCard = ({ title, value, change, trend, icon: Icon, color, bgColor }: any) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div className="flex items-start justify-between">
-            <div>
-                <p className="text-sm text-gray-500 font-medium">{title}</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">{value}</p>
-                <div className={`flex items-center gap-1 mt-2 text-sm font-semibold ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                    {trend === 'up' ? <FiArrowUp size={14} /> : <FiArrowDown size={14} />}
-                    <span>{change}%</span>
-                    <span className="text-gray-400 font-normal ml-1">vs last month</span>
-                </div>
+const StatCard = ({
+  title,
+  value,
+  change,
+  subtext,
+  icon: Icon,
+  color,
+  bgColor,
+}: {
+  title: string;
+  value: string;
+  change?: number;
+  subtext?: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  color: string;
+  bgColor: string;
+}) => {
+  const isPositive = (change ?? 0) >= 0;
+
+  return (
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-400">{title}</p>
+          <p className="text-2xl lg:text-3xl font-extrabold text-gray-900 mt-2">{value}</p>
+          {change !== undefined ? (
+            <div
+              className={`flex items-center gap-1 mt-2.5 text-xs font-semibold ${
+                isPositive ? "text-emerald-600" : "text-rose-600"
+              }`}
+            >
+              {isPositive ? <FiArrowUp size={14} /> : <FiArrowDown size={14} />}
+              <span>{Math.abs(change)}%</span>
+              <span className="text-gray-400 font-normal ml-1">vs previous period</span>
             </div>
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${bgColor}`}>
-                <Icon size={26} className={color} />
-            </div>
+          ) : (
+            <p className="text-xs text-gray-400 mt-2.5">{subtext}</p>
+          )}
         </div>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${bgColor}`}>
+          <Icon size={24} className={color} />
+        </div>
+      </div>
     </div>
-);
+  );
+};
 
 export default function AnalyticsPage() {
-    const [loading, setLoading] = useState(false);
-    const [dateRange, setDateRange] = useState('30d');
-    const [data, setData] = useState(demoData);
+  const [range, setRange] = useState<"today" | "7days" | "30days" | "year">("7days");
+  const { data: statsResponse, isLoading, refetch } = useGetDashboardStatsQuery(range);
+  const { data: logsResponse, isLoading: isLoadingLogs, refetch: refetchLogs } = useGetTrackingLogsQuery(8);
 
-    const fetchAnalytics = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch(`${API_URL}/analytics/overview?range=${dateRange}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            const result = await res.json();
-            if (result.success) {
-                setData({ ...demoData, ...result.data });
-            }
-        } catch (error) {
-            console.error('Error fetching analytics:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const stats = statsResponse?.data;
+  const overview = stats?.overview;
+  const alerts = stats?.alerts;
+  const revenueChart = stats?.revenueChart || [];
+  const statusBreakdown = stats?.orderStatus || {};
+  const topProducts = stats?.topProducts || [];
+  const topCategories = stats?.topCategories || [];
 
-    useEffect(() => {
-        fetchAnalytics();
-    }, [dateRange]);
+  const maxRevenue = Math.max(
+    ...revenueChart.map((item: any) => Number(item.revenue) || 0),
+    1
+  );
 
-    const maxRevenue = Math.max(...data.revenueByMonth.map(m => m.revenue));
+  const averageOrderValue =
+    overview && overview.orders?.total > 0
+      ? Math.round(overview.revenue?.total / overview.orders?.total)
+      : 0;
 
-    return (
-        <div className="space-y-6">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Analytics</h1>
-                    <p className="text-gray-500 mt-1">Track your store performance</p>
-                </div>
-                <div className="flex gap-3">
-                    <select
-                        value={dateRange}
-                        onChange={(e) => setDateRange(e.target.value)}
-                        className="px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-sm font-medium focus:ring-2 focus:ring-[#5CAF90] focus:border-transparent"
-                    >
-                        <option value="7d">Last 7 days</option>
-                        <option value="30d">Last 30 days</option>
-                        <option value="90d">Last 3 months</option>
-                        <option value="365d">This year</option>
-                    </select>
-                    <button
-                        onClick={fetchAnalytics}
-                        className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
-                    >
-                        <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                        Refresh
-                    </button>
-                </div>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard
-                    title="Total Revenue"
-                    value={`৳${data.overview.totalRevenue.toLocaleString()}`}
-                    change={data.overview.revenueGrowth}
-                    trend="up"
-                    icon={FiDollarSign}
-                    color="text-[#5CAF90]"
-                    bgColor="bg-[#5CAF90]/10"
-                />
-                <StatCard
-                    title="Total Orders"
-                    value={data.overview.totalOrders.toLocaleString()}
-                    change={data.overview.ordersGrowth}
-                    trend="up"
-                    icon={FiShoppingCart}
-                    color="text-blue-500"
-                    bgColor="bg-blue-50"
-                />
-                <StatCard
-                    title="Total Customers"
-                    value={data.overview.totalCustomers.toLocaleString()}
-                    change={data.overview.customersGrowth}
-                    trend="up"
-                    icon={FiUsers}
-                    color="text-purple-500"
-                    bgColor="bg-purple-50"
-                />
-                <StatCard
-                    title="Avg. Order Value"
-                    value={`৳${data.overview.averageOrderValue.toLocaleString()}`}
-                    change={data.overview.aovGrowth}
-                    trend="up"
-                    icon={FiActivity}
-                    color="text-orange-500"
-                    bgColor="bg-orange-50"
-                />
-            </div>
-
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Revenue Chart */}
-                <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-800">Revenue Overview</h2>
-                            <p className="text-sm text-gray-500">Monthly revenue breakdown</p>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                            <span className="flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full bg-[#5CAF90]"></span>
-                                Revenue
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="h-72 flex items-end justify-between gap-2">
-                        {data.revenueByMonth.map((item, i) => (
-                            <div key={item.month} className="flex-1 flex flex-col items-center gap-2 group">
-                                <div className="relative w-full">
-                                    <div
-                                        className="w-full bg-gradient-to-t from-[#5CAF90] to-[#7BC4A8] rounded-t-lg transition-all duration-300 cursor-pointer hover:from-[#4A9A7D] hover:to-[#5CAF90]"
-                                        style={{ height: `${(item.revenue / maxRevenue) * 220}px` }}
-                                    >
-                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                            ৳{item.revenue.toLocaleString()}
-                                        </div>
-                                    </div>
-                                </div>
-                                <span className="text-xs text-gray-500 font-medium">{item.month}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Category Distribution */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-800">Sales by Category</h2>
-                            <p className="text-sm text-gray-500">Product category breakdown</p>
-                        </div>
-                        <FiPieChart size={20} className="text-gray-400" />
-                    </div>
-
-                    {/* Donut Chart Placeholder */}
-                    <div className="relative w-48 h-48 mx-auto mb-6">
-                        <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                            {data.topCategories.reduce((acc: any[], cat, i) => {
-                                const offset = acc.length > 0 ? acc[acc.length - 1].offset + acc[acc.length - 1].value * 3.14159 * 0.8 : 0;
-                                acc.push({
-                                    ...cat,
-                                    offset,
-                                    dashArray: `${cat.value * 3.14159 * 0.8} ${100 * 3.14159 * 0.8}`,
-                                });
-                                return acc;
-                            }, []).map((cat: any, i: number) => (
-                                <circle
-                                    key={i}
-                                    cx="50"
-                                    cy="50"
-                                    r="40"
-                                    fill="none"
-                                    stroke={cat.color}
-                                    strokeWidth="20"
-                                    strokeDasharray={cat.dashArray}
-                                    strokeDashoffset={-cat.offset}
-                                />
-                            ))}
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                                <p className="text-2xl font-bold text-gray-800">100%</p>
-                                <p className="text-xs text-gray-500">Total</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3">
-                        {data.topCategories.map((cat, i) => (
-                            <div key={i} className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }}></span>
-                                    <span className="text-sm text-gray-600">{cat.name}</span>
-                                </div>
-                                <span className="text-sm font-semibold text-gray-800">{cat.value}%</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Second Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Top Products */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-800">Top Products</h2>
-                            <p className="text-sm text-gray-500">Best selling items</p>
-                        </div>
-                        <FiBarChart2 size={20} className="text-gray-400" />
-                    </div>
-
-                    <div className="space-y-4">
-                        {data.topProducts.map((product, i) => (
-                            <div key={i} className="flex items-center gap-4">
-                                <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-500">
-                                    {i + 1}
-                                </span>
-                                <div className="flex-1">
-                                    <p className="font-medium text-gray-800">{product.name}</p>
-                                    <div className="flex items-center gap-4 mt-1">
-                                        <span className="text-xs text-gray-500">{product.sales} sales</span>
-                                        <span className="text-xs font-semibold text-[#5CAF90]">৳{product.revenue.toLocaleString()}</span>
-                                    </div>
-                                </div>
-                                <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-[#5CAF90] rounded-full"
-                                        style={{ width: `${(product.sales / data.topProducts[0].sales) * 100}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Top Cities */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-800">Orders by City</h2>
-                            <p className="text-sm text-gray-500">Geographic distribution</p>
-                        </div>
-                        <FiMapPin size={20} className="text-gray-400" />
-                    </div>
-
-                    <div className="space-y-4">
-                        {data.topCities.map((city, i) => (
-                            <div key={i}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-medium text-gray-700">{city.name}</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs text-gray-500">{city.orders} orders</span>
-                                        <span className="text-xs font-semibold text-gray-800">{city.percentage}%</span>
-                                    </div>
-                                </div>
-                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all"
-                                        style={{ width: `${city.percentage}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800">Recent Activity</h2>
-                        <p className="text-sm text-gray-500">Latest store events</p>
-                    </div>
-                </div>
-
-                <div className="space-y-4">
-                    {data.recentActivity.map((activity, i) => (
-                        <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${activity.type === 'order' ? 'bg-blue-100 text-blue-600' :
-                                activity.type === 'customer' ? 'bg-green-100 text-green-600' :
-                                    activity.type === 'payment' ? 'bg-purple-100 text-purple-600' :
-                                        'bg-yellow-100 text-yellow-600'
-                                }`}>
-                                {activity.type === 'order' ? <FiShoppingCart size={18} /> :
-                                    activity.type === 'customer' ? <FiUsers size={18} /> :
-                                        activity.type === 'payment' ? <FiDollarSign size={18} /> :
-                                            <FiActivity size={18} />}
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-700">{activity.message}</p>
-                                <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+  return (
+    <div className="space-y-8 pb-12">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">E-Commerce & Marketing Analytics</h1>
+            <span className="px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">
+              Live Database
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">
+            Real-time business performance, conversion rates, and server-side tracking health
+          </p>
         </div>
-    );
+
+        <div className="flex items-center gap-3">
+          <select
+            value={range}
+            onChange={(e) => setRange(e.target.value as any)}
+            className="px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-[#619d23] focus:border-transparent transition"
+          >
+            <option value="today">Today</option>
+            <option value="7days">Last 7 Days</option>
+            <option value="30days">Last 30 Days</option>
+            <option value="year">This Year</option>
+          </select>
+
+          <button
+            onClick={() => {
+              refetch();
+              refetchLogs();
+            }}
+            disabled={isLoading}
+            className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition disabled:opacity-50"
+          >
+            <FiRefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+
+          <Link
+            href="/dashboard/admin/marketing"
+            className="px-4 py-2 bg-[#619d23] hover:bg-[#52841d] text-white rounded-xl text-sm font-semibold flex items-center gap-1.5 shadow-sm transition"
+          >
+            <FiTarget size={15} />
+            Pixels & CAPI
+          </Link>
+        </div>
+      </div>
+
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Total Gross Revenue"
+          value={`৳${(overview?.revenue?.total ?? 0).toLocaleString()}`}
+          change={overview?.revenue?.change}
+          icon={FiDollarSign}
+          color="text-[#619d23]"
+          bgColor="bg-emerald-50"
+        />
+        <StatCard
+          title="Total Orders"
+          value={(overview?.orders?.total ?? 0).toLocaleString()}
+          change={overview?.orders?.change}
+          icon={FiShoppingCart}
+          color="text-blue-600"
+          bgColor="bg-blue-50"
+        />
+        <StatCard
+          title="Average Order Value (AOV)"
+          value={`৳${averageOrderValue.toLocaleString()}`}
+          subtext="Revenue per order in this period"
+          icon={FiActivity}
+          color="text-purple-600"
+          bgColor="bg-purple-50"
+        />
+        <StatCard
+          title="Delivery Success Rate"
+          value={`${alerts?.successRate ?? 0}%`}
+          subtext={`${alerts?.deliveredOrders ?? 0} delivered vs ${alerts?.cancelledOrders ?? 0} cancelled`}
+          icon={FiCheckCircle}
+          color="text-amber-600"
+          bgColor="bg-amber-50"
+        />
+      </div>
+
+      {/* Secondary Quick Metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+            <FiClock size={18} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Pending Orders</p>
+            <p className="text-lg font-bold text-gray-800">{alerts?.pendingOrders ?? 0}</p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+            <FiAlertTriangle size={18} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Low Stock Products</p>
+            <p className="text-lg font-bold text-gray-800">{alerts?.lowStockProducts ?? 0}</p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+            <FiTruck size={18} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Active Riders</p>
+            <p className="text-lg font-bold text-gray-800">{alerts?.onlineRiders ?? 0}</p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <FiUsers size={18} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-medium">Total Customers</p>
+            <p className="text-lg font-bold text-gray-800">{(overview?.customers?.total ?? 0).toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Revenue Breakdown Chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Revenue & Order Trend</h2>
+              <p className="text-xs text-gray-500">Sales volume across the selected timeframe</p>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-semibold">
+              <span className="flex items-center gap-1.5 text-gray-600">
+                <span className="w-3 h-3 rounded-full bg-[#619d23]" />
+                Daily Sales (৳)
+              </span>
+            </div>
+          </div>
+
+          {revenueChart.length > 0 ? (
+            <div className="h-72 flex items-end justify-between gap-2 pt-6">
+              {revenueChart.map((item: any) => {
+                const heightPercent = Math.max((Number(item.revenue) / maxRevenue) * 200, 12);
+                return (
+                  <div key={item.date} className="flex-1 flex flex-col items-center gap-2 group">
+                    <div className="relative w-full flex items-end justify-center">
+                      <div
+                        className="w-full max-w-[40px] bg-gradient-to-t from-[#619d23] to-[#87c449] rounded-t-lg transition-all duration-300 group-hover:from-[#52841d] group-hover:to-[#619d23]"
+                        style={{ height: `${heightPercent}px` }}
+                      >
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-lg pointer-events-none">
+                          <p>৳{Number(item.revenue).toLocaleString()}</p>
+                          <p className="text-[10px] text-gray-300 font-normal">{item.orders} orders</p>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-gray-400 font-mono truncate max-w-[48px]">
+                      {item.date?.slice(5)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="h-64 flex flex-col items-center justify-center text-gray-400 text-sm">
+              <FiBarChart2 size={36} className="text-gray-300 mb-2" />
+              <p>No revenue data recorded for this time frame yet.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Order Status Breakdown */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Order Fulfillment Status</h2>
+              <p className="text-xs text-gray-500">Distribution of monthly orders</p>
+            </div>
+            <FiPieChart size={20} className="text-gray-400" />
+          </div>
+
+          <div className="space-y-3.5 mt-6">
+            {[
+              { key: "delivered", label: "Delivered", color: "bg-emerald-500", text: "text-emerald-700" },
+              { key: "processing", label: "Processing", color: "bg-blue-500", text: "text-blue-700" },
+              { key: "shipped", label: "Shipped", color: "bg-indigo-500", text: "text-indigo-700" },
+              { key: "pending", label: "Pending", color: "bg-amber-500", text: "text-amber-700" },
+              { key: "cancelled", label: "Cancelled", color: "bg-rose-500", text: "text-rose-700" },
+              { key: "returned", label: "Returned", color: "bg-gray-400", text: "text-gray-700" },
+            ].map(({ key, label, color, text }) => {
+              const count = statusBreakdown[key]?.count ?? 0;
+              const percent = statusBreakdown[key]?.percent ?? 0;
+
+              return (
+                <div key={key}>
+                  <div className="flex items-center justify-between text-xs font-semibold mb-1">
+                    <span className="text-gray-700 flex items-center gap-2">
+                      <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
+                      {label}
+                    </span>
+                    <span className="text-gray-500">
+                      {count} <span className="text-gray-400 font-normal">({percent}%)</span>
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${color} rounded-full transition-all duration-500`}
+                      style={{ width: `${Math.min(percent, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Top Products and Top Categories Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Selling Products */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Top Selling Products</h2>
+              <p className="text-xs text-gray-500">Highest volume items sold in selected period</p>
+            </div>
+            <FiPackage size={20} className="text-gray-400" />
+          </div>
+
+          {topProducts.length > 0 ? (
+            <div className="space-y-4">
+              {topProducts.map((product: any, idx: number) => (
+                <div key={product._id || idx} className="flex items-center gap-4 p-2 rounded-xl hover:bg-gray-50 transition">
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                    {product.thumbnail ? (
+                      <img
+                        src={product.thumbnail}
+                        alt={product.productName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs font-bold text-gray-400">#{idx + 1}</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-gray-800 truncate">{product.productName || "Unnamed Product"}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {product.totalSold} sold • <span className="font-semibold text-[#619d23]">৳{Number(product.totalRevenue).toLocaleString()}</span>
+                    </p>
+                  </div>
+                  <span className="px-2.5 py-1 text-xs font-bold bg-gray-100 text-gray-700 rounded-lg">
+                    #{idx + 1}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-gray-400 text-sm">
+              No product sales data available for this range.
+            </div>
+          )}
+        </div>
+
+        {/* Top Categories */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Top Categories by Revenue</h2>
+              <p className="text-xs text-gray-500">Best performing grocery categories</p>
+            </div>
+            <FiPieChart size={20} className="text-gray-400" />
+          </div>
+
+          {topCategories.length > 0 ? (
+            <div className="space-y-4">
+              {topCategories.map((cat: any, idx: number) => (
+                <div key={cat._id || idx} className="p-3 bg-gray-50/70 rounded-xl">
+                  <div className="flex items-center justify-between text-xs font-semibold mb-1">
+                    <span className="text-gray-800 font-bold">{cat.categoryName || "Category"}</span>
+                    <span className="text-[#619d23] font-bold">৳{Number(cat.totalRevenue).toLocaleString()}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500">{cat.totalSold} items ordered</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-gray-400 text-sm">
+              No category sales data recorded in this period.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Tracking Audit Trail & Ad Conversions Health */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
+              <FiTarget />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Conversions API (CAPI) & Ad Tracking Health</h3>
+              <p className="text-xs text-gray-500">
+                Server-side audit log verifying purchases and pageviews sent to Meta, GA4, and TikTok
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/dashboard/admin/marketing"
+            className="text-xs font-bold text-[#619d23] hover:underline flex items-center gap-1"
+          >
+            Manage Pixels & Tokens &rarr;
+          </Link>
+        </div>
+
+        {logsResponse?.data && logsResponse.data.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-gray-600">
+              <thead className="bg-gray-50 text-gray-500 uppercase font-semibold">
+                <tr>
+                  <th className="py-2.5 px-4 rounded-l-lg">Event</th>
+                  <th className="py-2.5 px-4">Identifier / Order</th>
+                  <th className="py-2.5 px-4">Meta CAPI</th>
+                  <th className="py-2.5 px-4">GA4</th>
+                  <th className="py-2.5 px-4">TikTok</th>
+                  <th className="py-2.5 px-4 rounded-r-lg">Dispatched At</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {logsResponse.data.slice(0, 6).map((log: any) => {
+                  const metaRes = log.providers?.find((p: any) => p.provider === "facebook");
+                  const ga4Res = log.providers?.find((p: any) => p.provider === "ga4");
+                  const ttRes = log.providers?.find((p: any) => p.provider === "tiktok");
+
+                  return (
+                    <tr key={log._id} className="hover:bg-gray-50/60 transition">
+                      <td className="py-3 px-4 font-bold text-gray-800">
+                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded">
+                          {log.eventName}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 font-mono text-gray-500">
+                        {log.orderId ? `Order #${log.orderId.slice(-6)}` : log.userIdentifier || "Visitor"}
+                      </td>
+                      <td className="py-3 px-4">
+                        {metaRes ? (
+                          metaRes.success ? (
+                            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                              <FiCheckCircle size={13} /> Active
+                            </span>
+                          ) : (
+                            <span className="text-rose-500 font-semibold flex items-center gap-1" title={metaRes.error}>
+                              <FiXCircle size={13} /> Error
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-gray-300">Off</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        {ga4Res ? (
+                          ga4Res.success ? (
+                            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                              <FiCheckCircle size={13} /> Active
+                            </span>
+                          ) : (
+                            <span className="text-rose-500 font-semibold flex items-center gap-1" title={ga4Res.error}>
+                              <FiXCircle size={13} /> Error
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-gray-300">Off</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        {ttRes ? (
+                          ttRes.success ? (
+                            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                              <FiCheckCircle size={13} /> Active
+                            </span>
+                          ) : (
+                            <span className="text-rose-500 font-semibold flex items-center gap-1" title={ttRes.error}>
+                              <FiXCircle size={13} /> Error
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-gray-300">Off</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-gray-400 font-mono">
+                        {new Date(log.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400 text-center py-6">
+            No tracking logs yet. Configure your IDs in the Marketing settings to begin tracking.
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
