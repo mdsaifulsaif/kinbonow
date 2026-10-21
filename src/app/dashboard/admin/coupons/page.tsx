@@ -28,6 +28,7 @@ import {
 } from '@/redux/api/couponApi';
 import { useGetProductsQuery } from '@/redux/api/productApi';
 import { useGetCategoriesQuery } from '@/redux/api/categoryApi';
+import { useGetCustomersQuery } from '@/redux/api/customerApi';
 import toast from 'react-hot-toast';
 
 const formatDate = (date: string | Date) => {
@@ -131,11 +132,13 @@ const CouponModal = ({
         applicableTo: 'all',
         specificProducts: [] as string[],
         specificCategories: [] as string[],
+        specificUsers: [] as string[],
         isActive: true,
     });
 
     const { data: productsData, isLoading: isLoadingProducts } = useGetProductsQuery({ limit: 1000 });
     const { data: categoriesData, isLoading: isLoadingCategories } = useGetCategoriesQuery({ limit: 1000 });
+    const { data: customersData, isLoading: isLoadingCustomers } = useGetCustomersQuery({ limit: 1000 });
 
     useEffect(() => {
         if (editingCoupon) {
@@ -152,8 +155,9 @@ const CouponModal = ({
                 usageLimit: editingCoupon.usageLimit || 0,
                 usagePerUser: editingCoupon.usagePerUser || 1,
                 applicableTo: editingCoupon.applicableTo || 'all',
-                specificProducts: editingCoupon.specificProducts || [],
-                specificCategories: editingCoupon.specificCategories || [],
+                specificProducts: (editingCoupon.specificProducts || []).map((p: any) => typeof p === 'object' ? p._id : p),
+                specificCategories: (editingCoupon.specificCategories || []).map((c: any) => typeof c === 'object' ? c._id : c),
+                specificUsers: (editingCoupon.specificUsers || []).map((u: any) => typeof u === 'object' ? u._id : u),
                 isActive: editingCoupon.isActive ?? true,
             });
         } else {
@@ -172,6 +176,7 @@ const CouponModal = ({
                 applicableTo: 'all',
                 specificProducts: [],
                 specificCategories: [],
+                specificUsers: [],
                 isActive: true,
             });
         }
@@ -188,7 +193,7 @@ const CouponModal = ({
         }));
     };
 
-    const toggleItem = (listName: 'specificProducts' | 'specificCategories', id: string) => {
+    const toggleItem = (listName: 'specificProducts' | 'specificCategories' | 'specificUsers', id: string) => {
         setFormData(prev => ({
             ...prev,
             [listName]: prev[listName].includes(id)
@@ -245,23 +250,24 @@ const CouponModal = ({
                     <div className="space-y-4 pt-2 border-t border-gray-100">
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Apply Coupon To</label>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                                 {[
                                     { id: 'all', label: 'Full Store', icon: FiPackage },
                                     { id: 'specific_products', label: 'Specific Products', icon: FiTag },
                                     { id: 'specific_categories', label: 'Specific Categories', icon: FiLayers },
+                                    { id: 'specific_users', label: 'Specific Customers', icon: FiUsers },
                                 ].map((option) => (
                                     <button
                                         key={option.id}
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, applicableTo: option.id }))}
-                                        className={`flex flex-col items-center justify-center p-3 rounded-md border transition-all gap-2 ${formData.applicableTo === option.id
+                                        className={`flex flex-col items-center justify-center p-2.5 rounded-md border transition-all gap-1.5 text-center ${formData.applicableTo === option.id
                                                 ? 'bg-green-50 border-[#5CAF90] text-[#5CAF90] shadow-sm'
                                                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
                                             }`}
                                     >
-                                        <option.icon size={18} />
-                                        <span className="text-[10px] font-bold uppercase">{option.label}</span>
+                                        <option.icon size={16} />
+                                        <span className="text-[10px] font-bold uppercase leading-tight">{option.label}</span>
                                     </button>
                                 ))}
                             </div>
@@ -284,6 +290,19 @@ const CouponModal = ({
                                 selectedIds={formData.specificCategories}
                                 onToggle={(id) => toggleItem('specificCategories', id)}
                                 isLoading={isLoadingCategories}
+                            />
+                        )}
+
+                        {formData.applicableTo === 'specific_users' && (
+                            <SelectionBox
+                                label="Customers"
+                                items={(customersData?.data || []).map((u: any) => ({
+                                    _id: u._id,
+                                    name: `${u.fullName || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'User'} (${u.phoneNumber || u.email || 'No contact'})`
+                                }))}
+                                selectedIds={formData.specificUsers}
+                                onToggle={(id) => toggleItem('specificUsers', id)}
+                                isLoading={isLoadingCustomers}
                             />
                         )}
                     </div>
@@ -548,10 +567,11 @@ export default function CouponsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col gap-1">
-                                                <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5">
+                                                <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5 flex-wrap">
                                                     {coupon.applicableTo === 'all' && <><FiPackage className="text-blue-500" size={12} /> All Products</>}
                                                     {coupon.applicableTo === 'specific_products' && <><FiTag className="text-amber-500" size={12} /> Specific Products ({coupon.specificProducts?.length || 0})</>}
                                                     {coupon.applicableTo === 'specific_categories' && <><FiLayers className="text-purple-500" size={12} /> Specific Categories ({coupon.specificCategories?.length || 0})</>}
+                                                    {coupon.applicableTo === 'specific_users' && <><FiUsers className="text-emerald-500" size={12} /> Specific Customers ({coupon.specificUsers?.length || 0})</>}
                                                 </span>
                                             </div>
                                         </td>
