@@ -36,6 +36,7 @@ import {
   FiMail,
   FiRepeat,
   FiTarget,
+  FiMessageSquare,
 } from "react-icons/fi";
 import { useSocket } from "@/lib/socket";
 
@@ -97,6 +98,7 @@ const menuItems = [
     ],
   },
   { name: "Complaints", href: "/dashboard/admin/complaints", icon: FiAlertCircle, badge: null as string | null },
+  { name: "Live Chat", href: "/dashboard/admin/chat", icon: FiMessageSquare, badge: "Live" as string | null, badgeColor: "bg-emerald-600" },
   {
     name: "Riders",
     href: "/dashboard/admin/riders",

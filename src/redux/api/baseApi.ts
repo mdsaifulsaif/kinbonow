@@ -89,6 +89,7 @@ export const baseApi = createApi({
     "MarketingSetting",
     "TrackingLogs",
     "ThemeSetting",
+    "Chat",
   ],
   endpoints: () => ({}),
 });
