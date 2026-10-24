@@ -21,10 +21,20 @@ import { toast } from 'react-hot-toast';
 
 const CategoriesPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: categoriesData, isLoading, refetch } = useGetCategoriesQuery({});
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [statusFilter, setStatusFilter] = useState('');
+
+    const { data: categoriesData, isLoading, refetch } = useGetCategoriesQuery({
+        page,
+        limit,
+        searchTerm: searchTerm.trim() || undefined,
+        status: statusFilter || undefined,
+    });
     const [deleteCategory] = useDeleteCategoryMutation();
 
     const categories = categoriesData?.data || [];
+    const meta = categoriesData?.meta || { page: 1, limit: 10, total: 0, totalPage: 1 };
 
     const handleDelete = async (id: string) => {
         if (window.confirm('Are you sure you want to delete this category?')) {
@@ -35,6 +45,11 @@ const CategoriesPage = () => {
                 toast.error(error?.data?.message || 'Failed to delete category');
             }
         }
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        setPage(1);
     };
 
     const filteredCategories = categories.filter((cat: any) =>
@@ -67,15 +82,23 @@ const CategoriesPage = () => {
                         placeholder="Search categories..."
                         className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-[#5CAF90] focus:bg-white transition-all text-sm"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearchChange}
                     />
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                    <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm">
-                        <FiFilter size={18} />
-                        Filter
-                    </button>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
+                            setPage(1);
+                        }}
+                        className="px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-[#5CAF90] text-gray-700 font-medium"
+                    >
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                     <button onClick={() => refetch()} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm">
                         Refresh
                     </button>
@@ -90,7 +113,8 @@ const CategoriesPage = () => {
                         <p>Loading categories...</p>
                     </div>
                 ) : filteredCategories.length > 0 ? (
-                    <div className="overflow-x-auto">
+                    <>
+                        <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50 border-b border-gray-100">
@@ -171,6 +195,86 @@ const CategoriesPage = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Pagination */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-gray-100 bg-gray-50/40">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                            <span>
+                                Showing{' '}
+                                <span className="font-semibold text-gray-700">
+                                    {meta.total > 0 ? (page - 1) * limit + 1 : 0}–{Math.min(page * limit, meta.total)}
+                                </span>
+                                {' '}of{' '}
+                                <span className="font-semibold text-gray-700">{meta.total}</span> categories
+                            </span>
+                            <div className="flex items-center gap-1.5 ml-2">
+                                <span className="text-xs text-gray-400">Per page:</span>
+                                <select
+                                    value={limit}
+                                    onChange={(e) => {
+                                        setLimit(Number(e.target.value));
+                                        setPage(1);
+                                    }}
+                                    className="text-xs font-semibold bg-white border border-gray-200 rounded px-2 py-1 outline-none focus:border-[#5CAF90]"
+                                >
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {meta.totalPage > 1 && (
+                            <div className="flex items-center gap-1.5">
+                                <button
+                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    disabled={page <= 1}
+                                    className="px-3.5 py-1.5 text-xs font-semibold border border-gray-200 rounded-md hover:bg-white disabled:opacity-40 transition-all text-gray-600 bg-white shadow-sm"
+                                >
+                                    Previous
+                                </button>
+
+                                {Array.from({ length: meta.totalPage }, (_, i) => i + 1)
+                                    .filter((p) => p === 1 || p === meta.totalPage || Math.abs(p - page) <= 1)
+                                    .reduce((acc: (number | string)[], p, idx, arr) => {
+                                        if (idx > 0 && typeof arr[idx - 1] === 'number' && (p as number) - (arr[idx - 1] as number) > 1) {
+                                            acc.push('...');
+                                        }
+                                        acc.push(p);
+                                        return acc;
+                                    }, [])
+                                    .map((p, idx) =>
+                                        typeof p === 'number' ? (
+                                            <button
+                                                key={p}
+                                                onClick={() => setPage(p)}
+                                                className={`w-8 h-8 text-xs font-bold rounded-md transition-all ${
+                                                    page === p
+                                                        ? 'bg-[#5CAF90] text-white shadow-sm'
+                                                        : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                {p}
+                                            </button>
+                                        ) : (
+                                            <span key={`dots-${idx}`} className="px-1 text-gray-400 text-xs">
+                                                ...
+                                            </span>
+                                        )
+                                    )}
+
+                                <button
+                                    onClick={() => setPage((p) => Math.min(meta.totalPage, p + 1))}
+                                    disabled={page >= meta.totalPage}
+                                    className="px-3.5 py-1.5 text-xs font-semibold border border-gray-200 rounded-md hover:bg-white disabled:opacity-40 transition-all text-gray-600 bg-white shadow-sm"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </>
                 ) : (
                     <div className="p-20 text-center">
                         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
