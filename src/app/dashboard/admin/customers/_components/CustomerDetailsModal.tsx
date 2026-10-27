@@ -429,7 +429,7 @@ export default function CustomerDetailsModal({
         {/* Modal Footer */}
         <div className="px-6 py-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
           <p className="text-xs text-gray-400">
-            Powered by SobjiHaat Customer Intelligence
+            Powered by ShodaiBari Customer Intelligence
           </p>
           <button
             onClick={onClose}

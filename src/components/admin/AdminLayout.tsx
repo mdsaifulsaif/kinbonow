@@ -258,10 +258,10 @@ const handleLogout = async () => {
           {sidebarOpen && (
             <Link href="/dashboard/admin" className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#619d23] to-[#548a1e] flex items-center justify-center font-bold text-lg shadow-md">
-                M
+                S
               </div>
               <div>
-                <span className="font-bold text-lg">MegaShop</span>
+                <span className="font-bold text-lg">ShodaiBari</span>
                 <p className="text-xs text-gray-400">Admin Panel</p>
               </div>
             </Link>

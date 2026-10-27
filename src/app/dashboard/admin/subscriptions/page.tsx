@@ -195,7 +195,7 @@ export default function SubscriptionsPage() {
     }
     const formattedDate = formatDate(dateStr);
     const message = encodeURIComponent(
-      `আসসালামু আলাইকুম ${customerName}! সবজিহাট (SobjiHaat) থেকে আপনার সাবস্ক্রিপশন প্যাকেজ: "${productName}" আগামী ${formattedDate} তারিখে ডেলিভারির জন্য প্রস্তুত হচ্ছে। আপনার ডেলিভারি কনফার্ম করতে অনুগ্রহ করে রিপ্লাই দিন। ধন্যবাদ!`
+      `আসসালামু আলাইকুম ${customerName}! সদাইবাড়ি (ShodaiBari) থেকে আপনার সাবস্ক্রিপশন প্যাকেজ: "${productName}" আগামী ${formattedDate} তারিখে ডেলিভারির জন্য প্রস্তুত হচ্ছে। আপনার ডেলিভারি কনফার্ম করতে অনুগ্রহ করে রিপ্লাই দিন। ধন্যবাদ!`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
   };

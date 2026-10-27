@@ -125,7 +125,7 @@ const Hero: React.FC<HeroProps> = ({
                             */}
                             <img 
                                 src={image} 
-                                alt={`Sobjihut Banner ${index + 1}`}
+                                alt={`ShodaiBari Banner ${index + 1}`}
                                 className="w-full h-full object-fill md:object-cover" 
                             />
                             
