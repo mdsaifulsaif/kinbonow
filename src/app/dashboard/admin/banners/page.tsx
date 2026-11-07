@@ -21,15 +21,18 @@ import {
   useDeleteBannerMutation,
   IBanner,
 } from "@/redux/api/bannerApi";
+import { useGetCategoriesQuery } from "@/redux/api/categoryApi";
 import toast from "react-hot-toast";
 
 const BannersPage = () => {
   const { data: response, isLoading, refetch } = useGetAdminBannersQuery();
+  const { data: categoriesResponse } = useGetCategoriesQuery({ limit: 100 });
   const [createBanner, { isLoading: isCreating }] = useCreateBannerMutation();
   const [updateBanner, { isLoading: isUpdating }] = useUpdateBannerMutation();
   const [deleteBanner, { isLoading: isDeleting }] = useDeleteBannerMutation();
 
   const banners: IBanner[] = response?.data || [];
+  const categories: any[] = categoriesResponse?.data || [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<IBanner | null>(null);
@@ -37,6 +40,8 @@ const BannersPage = () => {
   // Form State
   const [title, setTitle] = useState("");
   const [link, setLink] = useState("");
+  const [linkType, setLinkType] = useState<"category" | "custom" | "none">("category");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [order, setOrder] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(true);
   const [imageUrl, setImageUrl] = useState("");
@@ -46,6 +51,8 @@ const BannersPage = () => {
   const resetForm = () => {
     setTitle("");
     setLink("");
+    setLinkType("category");
+    setSelectedCategory("");
     setOrder(0);
     setIsActive(true);
     setImageUrl("");
@@ -63,12 +70,28 @@ const BannersPage = () => {
   const handleOpenEdit = (banner: IBanner) => {
     setEditingBanner(banner);
     setTitle(banner.title || "");
-    setLink(banner.link || "");
     setOrder(banner.order ?? 0);
     setIsActive(banner.isActive);
     setImageUrl(banner.image || "");
     setSelectedFile(null);
     setFilePreview(banner.image || "");
+
+    const currentLink = banner.link || "";
+    if (currentLink.startsWith("/cat/")) {
+      setLinkType("category");
+      const slug = currentLink.replace("/cat/", "");
+      setSelectedCategory(slug);
+      setLink("");
+    } else if (currentLink.trim()) {
+      setLinkType("custom");
+      setLink(currentLink);
+      setSelectedCategory("");
+    } else {
+      setLinkType("none");
+      setLink("");
+      setSelectedCategory("");
+    }
+
     setIsModalOpen(true);
   };
 
@@ -88,10 +111,27 @@ const BannersPage = () => {
       return;
     }
 
+    let finalLink = "";
+    if (linkType === "category") {
+      if (!selectedCategory) {
+        toast.error("Please select a category from the dropdown");
+        return;
+      }
+      finalLink = `/cat/${selectedCategory}`;
+    } else if (linkType === "custom") {
+      if (!link.trim()) {
+        toast.error("Please enter a custom URL");
+        return;
+      }
+      finalLink = link.trim();
+    } else {
+      finalLink = "";
+    }
+
     try {
       const formData = new FormData();
       if (title.trim()) formData.append("title", title.trim());
-      if (link.trim()) formData.append("link", link.trim());
+      formData.append("link", finalLink);
       formData.append("order", String(order));
       formData.append("isActive", String(isActive));
 
@@ -274,10 +314,18 @@ const BannersPage = () => {
                     </h3>
 
                     {banner.link ? (
-                      <p className="text-xs text-[var(--color-primary)] flex items-center gap-1 truncate font-mono">
-                        <FiLink size={12} className="shrink-0" />
-                        <span>{banner.link}</span>
-                      </p>
+                      <div className="flex items-center gap-1.5 text-xs flex-wrap">
+                        {banner.link.startsWith("/cat/") ? (
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
+                            📂 Category: {categories.find((c: any) => `/cat/${c.slug}` === banner.link)?.name || banner.link.replace("/cat/", "")}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold flex items-center gap-1 font-mono">
+                            <FiLink size={11} className="shrink-0" />
+                            <span>{banner.link}</span>
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <p className="text-[11px] text-gray-400 italic">No redirect link</p>
                     )}
@@ -418,18 +466,108 @@ const BannersPage = () => {
                 />
               </div>
 
-              {/* Redirect Link */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-700 block">
-                  Redirect Link (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder="e.g. /shop?category=fresh-vegetables or /offers"
-                  className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-[var(--color-primary)] focus:bg-white transition font-mono"
-                />
+              {/* Banner Click Action / Link (2 Options) */}
+              <div className="space-y-2.5 p-3.5 bg-gray-50/80 rounded-2xl border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-gray-700 block">
+                    Banner Click Action (Redirect)
+                  </label>
+                  {linkType === "category" && selectedCategory && (
+                    <span className="text-[10px] text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      Target: /cat/{selectedCategory}
+                    </span>
+                  )}
+                </div>
+
+                {/* 2 Main Options Selector (+ No Link) */}
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-white rounded-xl border border-gray-200 text-xs shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => setLinkType("category")}
+                    className={`py-1.5 px-2 rounded-lg font-semibold transition text-center cursor-pointer ${
+                      linkType === "category"
+                        ? "bg-[var(--color-primary)] text-white shadow-xs"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    📂 Category
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLinkType("custom")}
+                    className={`py-1.5 px-2 rounded-lg font-semibold transition text-center cursor-pointer ${
+                      linkType === "custom"
+                        ? "bg-[var(--color-primary)] text-white shadow-xs"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    🔗 Custom Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLinkType("none")}
+                    className={`py-1.5 px-2 rounded-lg font-semibold transition text-center cursor-pointer ${
+                      linkType === "none"
+                        ? "bg-gray-700 text-white shadow-xs"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    🚫 No Link
+                  </button>
+                </div>
+
+                {/* 1. Category Dropdown Option */}
+                {linkType === "category" && (
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-[11px] font-semibold text-gray-600 block">
+                      Choose Category from Dropdown:
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-xl outline-none focus:border-[var(--color-primary)] transition"
+                    >
+                      <option value="">-- Select a Category --</option>
+                      {categories.map((cat: any) => (
+                        <option key={cat._id} value={cat.slug}>
+                          {cat.name} ({cat.slug})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[10px] text-gray-500">
+                      Clicking this banner will automatically navigate customers to{" "}
+                      <span className="font-mono text-emerald-700 font-medium">
+                        /cat/{selectedCategory || "[category-slug]"}
+                      </span>
+                    </p>
+                  </div>
+                )}
+
+                {/* 2. Custom Link Option */}
+                {linkType === "custom" && (
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-[11px] font-semibold text-gray-600 block">
+                      Custom URL (Internal or External):
+                    </label>
+                    <input
+                      type="text"
+                      value={link}
+                      onChange={(e) => setLink(e.target.value)}
+                      placeholder="e.g. /offers, /brands/my-brand, or https://example.com"
+                      className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-xl outline-none focus:border-[var(--color-primary)] transition font-mono"
+                    />
+                    <p className="text-[10px] text-gray-500">
+                      Copy and paste any page URL or external promotion link here.
+                    </p>
+                  </div>
+                )}
+
+                {/* 3. No Link Option */}
+                {linkType === "none" && (
+                  <p className="text-[11px] text-gray-400 italic pt-0.5">
+                    This banner will be display-only without an active click/redirect action.
+                  </p>
+                )}
               </div>
 
               {/* Order & Active Switch in 2 columns */}
