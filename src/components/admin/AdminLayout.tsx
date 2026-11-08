@@ -129,6 +129,7 @@ const menuItems = [
   { name: "Reviews", href: "/dashboard/admin/reviews", icon: FiStar, badge: "5", badgeColor: "bg-yellow-500" },
   { name: "Coupons", href: "/dashboard/admin/coupons", icon: FiTag, badge: null as string | null },
   { name: "Hero Banners", href: "/dashboard/admin/banners", icon: FiImage, badge: null as string | null },
+  { name: "Promotional Banners", href: "/dashboard/admin/promotional-banners", icon: FiLayers, badge: null as string | null },
   { name: "Analytics", href: "/dashboard/admin/analytics", icon: FiBarChart2, badge: null as string | null },
   { name: "Marketing & Pixels", href: "/dashboard/admin/marketing", icon: FiTarget, badge: "CAPI", badgeColor: "bg-purple-600" },
   { name: "System Health", href: "/dashboard/admin/health", icon: FiActivity, badge: null as string | null },
