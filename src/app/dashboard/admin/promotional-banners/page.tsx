@@ -81,9 +81,9 @@ const PromotionalBannersPage = () => {
     setFilePreview(banner.image || "");
 
     const currentLink = banner.link || "";
-    if (currentLink.startsWith("/cat/")) {
+    if (currentLink.startsWith("/category/") || currentLink.startsWith("/cat/")) {
       setLinkType("category");
-      const slug = currentLink.replace("/cat/", "");
+      const slug = currentLink.replace("/category/", "").replace("/cat/", "");
       setSelectedCategory(slug);
       setLink("");
     } else if (currentLink.trim()) {
@@ -121,7 +121,7 @@ const PromotionalBannersPage = () => {
         toast.error("Please select a category from the dropdown");
         return;
       }
-      finalLink = `/cat/${selectedCategory}`;
+      finalLink = `/category/${selectedCategory}`;
     } else if (linkType === "custom") {
       if (!link.trim()) {
         toast.error("Please enter a custom URL");
@@ -346,9 +346,9 @@ const PromotionalBannersPage = () => {
                     {/* Target Link Badge */}
                     <div className="mt-2.5">
                       {banner.link ? (
-                        banner.link.startsWith("/cat/") ? (
+                        banner.link.startsWith("/category/") || banner.link.startsWith("/cat/") ? (
                           <span className="px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold flex items-center gap-1 w-fit">
-                            📂 Category: {categories.find((c: any) => `/cat/${c.slug}` === banner.link)?.name || banner.link.replace("/cat/", "")}
+                            📂 Category: {categories.find((c: any) => `/category/${c.slug}` === banner.link || `/cat/${c.slug}` === banner.link)?.name || banner.link.replace("/category/", "").replace("/cat/", "")}
                           </span>
                         ) : (
                           <span className="px-2 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-semibold flex items-center gap-1 w-fit font-mono truncate max-w-full">
@@ -505,7 +505,7 @@ const PromotionalBannersPage = () => {
                   </label>
                   {linkType === "category" && selectedCategory && (
                     <span className="text-[10px] text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                      Target: /cat/{selectedCategory}
+                      Target: /category/{selectedCategory}
                     </span>
                   )}
                 </div>
@@ -568,7 +568,7 @@ const PromotionalBannersPage = () => {
                     <p className="text-[10px] text-gray-500">
                       Clicking this banner will navigate customers to{" "}
                       <span className="font-mono text-emerald-700 font-medium">
-                        /cat/{selectedCategory || "[category-slug]"}
+                        /category/{selectedCategory || "[category-slug]"}
                       </span>
                     </p>
                   </div>
