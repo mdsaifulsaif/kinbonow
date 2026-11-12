@@ -24,11 +24,11 @@ const MinHeader: React.FC = () => {
                     <Link href="/" className="flex-shrink-0 group">
                         <div className="flex items-center gap-3">
                             <div className="w-11 h-11 rounded-md bg-[var(--color-primary)] flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-[var(--color-primary)]/20 group-hover:scale-105 transition-all duration-300">
-                                K
+                                S
                             </div>
                             <div className="hidden sm:block">
                                 <h1 className="text-2xl font-bold tracking-tight leading-none text-gray-800">
-                                    Kinbo<span className="text-[var(--color-primary)]">Now</span>
+                                    Shodai<span className="text-[var(--color-primary)]">Bari</span>
                                 </h1>
                                 <p className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mt-1">Premium E-store</p>
                             </div>

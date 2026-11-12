@@ -1,5 +1,20 @@
 import { baseApi } from "./baseApi";
 
+export interface SubscriptionPaymentRecord {
+  _id: string;
+  cycleNumber: number;
+  billingMonth: string;
+  dueDate: string;
+  amount: number;
+  paymentStatus: "paid" | "unpaid" | "pending";
+  paidAt?: string;
+  paymentMethod?: string;
+  deliveryDate?: string;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface SubscriptionItem {
   _id: string;
   customerName: string;
@@ -36,10 +51,13 @@ export interface SubscriptionItem {
   paymentPreference: "cod" | "bkash" | "nagad";
   status: "active" | "paused" | "cancelled" | "completed";
 
+  payments?: SubscriptionPaymentRecord[];
+
   adminNotes?: string;
   createdAt: string;
   updatedAt: string;
 }
+
 
 export interface SubscriptionStats {
   total: number;
@@ -108,7 +126,47 @@ export const subscriptionApi = baseApi.injectEndpoints({
       invalidatesTags: ["Subscriptions"],
     }),
 
+    updateSubscriptionPaymentStatus: builder.mutation<
+      any,
+      {
+        id: string;
+        paymentId: string;
+        status: "paid" | "unpaid" | "pending";
+        paidAt?: string;
+        notes?: string;
+        paymentMethod?: string;
+      }
+    >({
+      query: ({ id, paymentId, ...body }) => ({
+        url: `/subscriptions/${id}/payments/${paymentId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Subscriptions"],
+    }),
+
+    addSubscriptionPaymentRecord: builder.mutation<
+      any,
+      {
+        id: string;
+        billingMonth: string;
+        dueDate: string;
+        amount: number;
+        paymentStatus?: "paid" | "unpaid" | "pending";
+        notes?: string;
+        paymentMethod?: string;
+      }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/subscriptions/${id}/payments`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Subscriptions"],
+    }),
+
     // --- Subscription Packages Endpoints ---
+
     getSubscriptionPackages: builder.query<
       { success: boolean; meta: any; data: SubscriptionPackageItem[] },
       Record<string, any>
@@ -230,6 +288,8 @@ export const {
   useToggleSubscriptionStatusMutation,
   useUpdateSubscriptionMutation,
   useDeleteSubscriptionMutation,
+  useUpdateSubscriptionPaymentStatusMutation,
+  useAddSubscriptionPaymentRecordMutation,
   useGetSubscriptionPackagesQuery,
   useGetSubscriptionPackageByIdQuery,
   useCreateSubscriptionPackageMutation,
@@ -239,4 +299,5 @@ export const {
   useUploadPackageImageMutation,
   useGetPackageCategoriesQuery,
 } = subscriptionApi;
+
 

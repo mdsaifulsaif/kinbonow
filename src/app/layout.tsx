@@ -3,10 +3,10 @@ import "./globals.css";
 import { ReduxProvider } from "@/redux";
 
 export const metadata: Metadata = {
-  title: "Mega Ecommerce - Best Online Shopping Experience",
+  title: "ShodaiBari - Best Online Shopping Experience",
   description:
-    "Shop the latest products with amazing deals. Premium quality products at best prices.",
-  keywords: "ecommerce, online shopping, best deals, products, shop",
+    "Shop fresh groceries and daily essentials at ShodaiBari with amazing deals and best prices.",
+  keywords: "ecommerce, online grocery, shodai, shodaibari, daily essentials, best deals",
 };
 
 import { Toaster } from "react-hot-toast";

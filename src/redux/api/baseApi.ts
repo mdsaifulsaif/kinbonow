@@ -84,11 +84,13 @@ export const baseApi = createApi({
     "AreaRequests",
     "Subscribers",
     "Banners",
+    "PromotionalBanners",
     "Subscriptions",
     "SubscriptionPackages",
     "MarketingSetting",
     "TrackingLogs",
     "ThemeSetting",
+    "Chat",
   ],
   endpoints: () => ({}),
 });

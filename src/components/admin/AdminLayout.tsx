@@ -36,6 +36,7 @@ import {
   FiMail,
   FiRepeat,
   FiTarget,
+  FiMessageSquare,
 } from "react-icons/fi";
 import { useSocket } from "@/lib/socket";
 
@@ -97,6 +98,7 @@ const menuItems = [
     ],
   },
   { name: "Complaints", href: "/dashboard/admin/complaints", icon: FiAlertCircle, badge: null as string | null },
+  { name: "Live Chat", href: "/dashboard/admin/chat", icon: FiMessageSquare, badge: "Live" as string | null, badgeColor: "bg-emerald-600" },
   {
     name: "Riders",
     href: "/dashboard/admin/riders",
@@ -127,6 +129,7 @@ const menuItems = [
   { name: "Reviews", href: "/dashboard/admin/reviews", icon: FiStar, badge: "5", badgeColor: "bg-yellow-500" },
   { name: "Coupons", href: "/dashboard/admin/coupons", icon: FiTag, badge: null as string | null },
   { name: "Hero Banners", href: "/dashboard/admin/banners", icon: FiImage, badge: null as string | null },
+  { name: "Promotional Banners", href: "/dashboard/admin/promotional-banners", icon: FiLayers, badge: null as string | null },
   { name: "Analytics", href: "/dashboard/admin/analytics", icon: FiBarChart2, badge: null as string | null },
   { name: "Marketing & Pixels", href: "/dashboard/admin/marketing", icon: FiTarget, badge: "CAPI", badgeColor: "bg-purple-600" },
   { name: "System Health", href: "/dashboard/admin/health", icon: FiActivity, badge: null as string | null },
@@ -256,10 +259,10 @@ const handleLogout = async () => {
           {sidebarOpen && (
             <Link href="/dashboard/admin" className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[#619d23] to-[#548a1e] flex items-center justify-center font-bold text-lg shadow-md">
-                M
+                S
               </div>
               <div>
-                <span className="font-bold text-lg">MegaShop</span>
+                <span className="font-bold text-lg">ShodaiBari</span>
                 <p className="text-xs text-gray-400">Admin Panel</p>
               </div>
             </Link>
